@@ -35,7 +35,8 @@ macro(setup)
 
     # add -forward-unknown-to-host-compiler for compatibility reasons
     # add -std=c++17 manually as older CMake seems to omit this (source gets treated as C otherwise)
-    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++17 -forward-unknown-to-host-compiler -arch=${CUDA_ARCH} -use_fast_math -restrict -keep ${CUDA_EXTRA_FLAGS}")
+    # FIXME cucorr: unsupported by clang's cuda: -use_fast_math -restrict -keep -forward-unknown-to-host-compiler 
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++17 -arch=${CUDA_ARCH}  ${CUDA_EXTRA_FLAGS}")
 
     # CMake defaults to -O2 for CUDA at Release, let's wipe that and use the global RELEASE_FLAG
     # appended later
