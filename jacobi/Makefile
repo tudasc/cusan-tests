@@ -25,28 +25,19 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Compilers
-MPICC=$(PREP) mpicc
-MPILD=$(PREP) mpic++
-NVCC=$(PREP) nvcc
+MPICC=$(PREP) ${CUCORR_MPICC_EXEC}
+MPILD=$(PREP) ${CUCORR_MPICXX_EXEC}
+NVCC=$(PREP) ${CUCORR_MPICXX_EXEC}
 
 # Flags
-CFLAGS=-std=c99 -O3 -march=native -Wall
+CFLAGS=-std=c99 -O3 -march=native -Wall -fsanitize=thread -g
 MPICFLAGS=-I${MPI_HOME}/include
 CUDACFLAGS=-I${CUDA_INSTALL_PATH}/include
-
-GENCODE_SM50    := -gencode arch=compute_50,code=sm_50
-GENCODE_SM52    := -gencode arch=compute_52,code=sm_52
-GENCODE_SM60    := -gencode arch=compute_60,code=sm_60
-GENCODE_SM70    := -gencode arch=compute_70,code=\"sm_70,compute_70\"
-GENCODE_FLAGS   := $(GENCODE_SM50) $(GENCODE_SM52) $(GENCODE_SM60) $(GENCODE_SM70)
-
-
-NVCCFLAGS=-O3 $(GENCODE_FLAGS) -Xcompiler -march=native
 
 CUDALDFLAGS=-L${CUDA_INSTALL_PATH}/lib64 -lcudart
 
 # Description of binaries
-BINDIR=../bin
+BINDIR=./bin
 JACOBI_CUDA_NORMAL_MPI=$(BINDIR)/jacobi_cuda_normal_mpi
 JACOBI_CUDA_AWARE_MPI=$(BINDIR)/jacobi_cuda_aware_mpi
 BINARIES=$(JACOBI_CUDA_NORMAL_MPI) $(JACOBI_CUDA_AWARE_MPI)
@@ -55,7 +46,7 @@ BINARIES=$(JACOBI_CUDA_NORMAL_MPI) $(JACOBI_CUDA_AWARE_MPI)
 all: $(BINARIES)
 
 device.o: Jacobi.h Device.cu Makefile
-	$(NVCC) $(MPICFLAGS) $(NVCCFLAGS) -c Device.cu -o device.o
+	$(NVCC) $(MPICFLAGS) $(CUDACFLAGS) -fsanitize=thread --cuda-gpu-arch=sm_72 -c Device.cu -o device.o
 
 input.o: Jacobi.h Input.c Makefile
 	$(MPICC) $(MPICFLAGS) $(CUDACFLAGS) $(CFLAGS) -c Input.c -o input.o
@@ -74,14 +65,14 @@ cuda_aware_mpi.o: Jacobi.h CUDA_Aware_MPI.c Makefile
 
 $(JACOBI_CUDA_NORMAL_MPI): jacobi.o input.o host.o device.o cuda_normal_mpi.o Makefile
 	mkdir -p $(BINDIR)
-	$(MPILD) -o $(JACOBI_CUDA_NORMAL_MPI) jacobi.o input.o host.o device.o  cuda_normal_mpi.o $(CUDALDFLAGS)
+	$(MPILD) -o $(JACOBI_CUDA_NORMAL_MPI) -fsanitize=thread jacobi.o input.o host.o device.o  cuda_normal_mpi.o $(CUDALDFLAGS)
 	
 $(JACOBI_CUDA_AWARE_MPI): jacobi.o input.o host.o device.o cuda_aware_mpi.o Makefile
 	mkdir -p $(BINDIR)
-	$(MPILD) -o $(JACOBI_CUDA_AWARE_MPI) jacobi.o input.o host.o device.o cuda_aware_mpi.o $(CUDALDFLAGS)
+	$(MPILD) -o $(JACOBI_CUDA_AWARE_MPI) -fsanitize=thread jacobi.o input.o host.o device.o cuda_aware_mpi.o $(CUDALDFLAGS)
 
 doc: CUDA_Normal_MPI.c CUDA_Aware_MPI.c Device.cu Host.c Input.c Makefile Jacobi.c Jacobi.h Jacobi.doxygen
 	doxygen Jacobi.doxygen
 	
 clean:
-	rm -rf *.o *~ $(BINARIES)
+	rm -rf *.o *~ $(BINARIES) *.yaml *.fatbin *.ptx
