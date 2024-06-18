@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+*.yaml
+*.fatbin
+*.ptx
