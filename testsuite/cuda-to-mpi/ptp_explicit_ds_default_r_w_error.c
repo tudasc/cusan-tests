@@ -3,7 +3,8 @@
 // RUN: %cucorr-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
-// CHECK-DAG: data race
+// CHECK-DAG: ThreadSanitizer: data race
+// CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
 
 #include "../support/gpu_mpi.h"
 
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]) {
   if (world_rank == 0) {
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
 #ifdef CUCORR_SYNC
-    cudaDeviceSynchronize(); // FIXME: uncomment for correct execution
+    // cudaDeviceSynchronize(); // FIXME: uncomment for correct execution
 #endif
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
   } else if (world_rank == 1) {
