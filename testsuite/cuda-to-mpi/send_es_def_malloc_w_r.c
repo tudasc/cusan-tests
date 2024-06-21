@@ -3,8 +3,9 @@
 // RUN: %cucorr-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
-// CHECK-DAG: ThreadSanitizer: data race
-// CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-NOT: ThreadSanitizer: data race
+// CHECK-NOT: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-NOT: [ERROR]
 
 #include "../support/gpu_mpi.h"
 
@@ -18,7 +19,7 @@ __global__ void kernel(int *arr, const int N) {
       __nanosleep(1000000U);
     }
 #else
-    printf(">>> __CUDA_ARCH__ !\n");
+    printf("[Error] __CUDA_ARCH__ !\n");
 #endif
     arr[tid] = (tid + 1);
   }
@@ -26,7 +27,7 @@ __global__ void kernel(int *arr, const int N) {
 
 int main(int argc, char *argv[]) {
   if (!has_gpu_aware_mpi()) {
-    printf("This example is designed for CUDA-aware MPI. Exiting.\n");
+    printf("[Error] This example is designed for CUDA-aware MPI. Exiting.\n");
     return 1;
   }
 
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
   if (world_size != 2) {
-    printf("This example is designed for 2 MPI processes. Exiting.\n");
+    printf("[Error] This example is designed for 2 MPI processes. Exiting.\n");
     MPI_Finalize();
     return 1;
   }
@@ -49,11 +50,15 @@ int main(int argc, char *argv[]) {
   cudaMalloc(&d_data, size * sizeof(int));
 
   if (world_rank == 0) {
+    cudaEvent_t event;
+    cudaEventCreate(&event);
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
-#ifdef CUCORR_SYNC
-    // cudaDeviceSynchronize(); // FIXME: uncomment for correct execution
-#endif
+    cudaEventRecord(event);
+
+    cudaEventSynchronize(event);  // TEST FIX
+
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
+    cudaEventDestroy(event);
   } else if (world_rank == 1) {
     MPI_Recv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }

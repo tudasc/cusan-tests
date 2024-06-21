@@ -18,7 +18,7 @@ __global__ void kernel(int *arr, const int N) {
       __nanosleep(1000000U);
     }
 #else
-    printf(">>> __CUDA_ARCH__ !\n");
+    printf("[Error] __CUDA_ARCH__ !\n");
 #endif
     arr[tid] = (tid + 1);
   }
@@ -26,7 +26,7 @@ __global__ void kernel(int *arr, const int N) {
 
 int main(int argc, char *argv[]) {
   if (!has_gpu_aware_mpi()) {
-    printf("This example is designed for CUDA-aware MPI. Exiting.\n");
+    printf("[Error] This example is designed for CUDA-aware MPI. Exiting.\n");
     return 1;
   }
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
   if (world_size != 2) {
-    printf("This example is designed for 2 MPI processes. Exiting.\n");
+    printf("[Error] This example is designed for 2 MPI processes. Exiting.\n");
     MPI_Finalize();
     return 1;
   }
