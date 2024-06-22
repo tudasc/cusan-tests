@@ -14,18 +14,30 @@ function(configure_jacobi_cfg input output)
 endfunction()
 
 function(add_build_clean_target name dir)
-    add_custom_target(build-${name}
+    add_custom_target(${name}-build
+        COMMAND "make" clean
         COMMAND ./build.sh
         WORKING_DIRECTORY ${dir}
     )
     
-    add_custom_target(clean-${name}
+    add_custom_target(${name}-vanilla-build
+        COMMAND "make" clean
+        COMMAND ./build.sh CUCORR_WRAPPER=OFF
+        WORKING_DIRECTORY ${dir}
+    )
+
+    add_custom_target(${name}-clean
         COMMAND "make" clean
         WORKING_DIRECTORY ${dir}
     )
 
-    add_custom_target(run-${name}
+    add_custom_target(${name}-run
         COMMAND ./run.sh
+        WORKING_DIRECTORY ${dir}
+    )
+    
+    add_custom_target(${name}-vanilla-run
+        COMMAND ./run.sh CUCORR_WRAPPER=OFF
         WORKING_DIRECTORY ${dir}
     )
 endfunction()

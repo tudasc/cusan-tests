@@ -8,4 +8,11 @@ export CUCORR_MPICC_EXEC="@cucorr_mpicc@"
 
 touch $TYPEART_TYPE_FILE
 touch $CUCORR_KERNEL_DATA_FILE
+
+preflag=$1
+if [ ! -z "$preflag" ]; then
+  export $preflag
+  echo "Exported : $preflag"
+fi
+
 make all -j 1
