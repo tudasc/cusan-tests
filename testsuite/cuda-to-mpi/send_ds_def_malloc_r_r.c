@@ -11,7 +11,7 @@
 
 #include <unistd.h>
 
-__global__ void kernel(int *arr, const int N) {
+__global__ void kernel(int* sum, int *arr, const int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   if (tid < N) {
 #if __CUDA_ARCH__ >= 700
@@ -21,7 +21,7 @@ __global__ void kernel(int *arr, const int N) {
 #else
     printf("[Error] __CUDA_ARCH__ !\n");
 #endif
-    arr[tid] = (tid + 1);
+    *sum += arr[tid] + (tid + 1);
   }
 }
 
@@ -48,32 +48,18 @@ int main(int argc, char *argv[]) {
 
   int *d_data;
   cudaMalloc(&d_data, size * sizeof(int));
+  cudaMemset(d_data,1,size*sizeof(int));
+  cudaDeviceSynchronize();
 
   if (world_rank == 0) {
-    cudaEvent_t event;
-    cudaEventCreate(&event);
-    kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
-    cudaEventRecord(event);
-
-    while(cudaEventQuery(event) != cudaSuccess) { } // TEST FIX
-
+    int* d_sum;
+    cudaMalloc(&d_sum, sizeof(int));
+    kernel<<<blocksPerGrid, threadsPerBlock>>>(d_sum, d_data, size);
+    // OK: kernel and MPI only read d_data
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
-    cudaEventDestroy(event);
+    cudaFree(d_sum);
   } else if (world_rank == 1) {
     MPI_Recv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-  }
-
-  if (world_rank == 1) {
-    int *h_data = (int *)malloc(size * sizeof(int));
-    cudaMemcpy(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost);
-    for (int i = 0; i < size; i++) {
-      const int buf_v = h_data[i];
-      if (buf_v == 0) {
-        printf("[Error] sync\n");
-        break;
-      }
-    }
-    free(h_data);
   }
 
   cudaDeviceSynchronize();

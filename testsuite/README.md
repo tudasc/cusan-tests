@@ -11,7 +11,12 @@ General: MPI call,Synchronization Calls,Stream Semantics,Memory Allocation,CUDA 
 - sq (StreamQuery)
 - eq (EventQuery)
 
+#### Synchronization (Implicit)
+- ds (DeviceSynchronize)
+- ms(a) (Memset(Async))
+- mc(a) (Memcopy(Async))
+
 #### Stream Semantics
 - def (Default stream)
-- def_user (Default stream and user defined stream)
+- defuser (Default stream and user defined stream)
 - user (User defined stream)*for stopm

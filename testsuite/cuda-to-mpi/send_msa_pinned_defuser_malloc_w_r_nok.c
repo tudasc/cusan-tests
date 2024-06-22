@@ -3,9 +3,9 @@
 // RUN: %cucorr-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
-// CHECK-NOT: ThreadSanitizer: data race
-// CHECK-NOT: Thread T{{[0-9]+}} 'cuda_stream'
-// CHECK-NOT: [Error]
+// CHECK-DAG: ThreadSanitizer: data race
+// CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-DAG: [Error]
 
 #include "../support/gpu_mpi.h"
 
@@ -24,6 +24,7 @@ __global__ void kernel(int *arr, const int N) {
     arr[tid] = (tid + 1);
   }
 }
+
 
 int main(int argc, char *argv[]) {
   if (!has_gpu_aware_mpi()) {
@@ -48,17 +49,23 @@ int main(int argc, char *argv[]) {
 
   int *d_data;
   cudaMalloc(&d_data, size * sizeof(int));
+  cudaMemset(d_data,0,size*sizeof(int));
+
+  cudaDeviceSynchronize();
 
   if (world_rank == 0) {
-    cudaEvent_t event;
-    cudaEventCreate(&event);
+    cudaStream_t stream;
+    cudaStreamCreate(&stream);
+    int *h_pinned_data;
+    const int pinned_size=1024 * size * sizeof(int);
+    cudaMallocHost((void **) &h_pinned_data, pinned_size);
+
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
-    cudaEventRecord(event);
-
-    while(cudaEventQuery(event) != cudaSuccess) { } // TEST FIX
-
+    cudaMemsetAsync(h_pinned_data, 1, pinned_size, stream);
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
-    cudaEventDestroy(event);
+    
+    cudaStreamSynchronize(stream);
+    cudaFreeHost(h_pinned_data);
   } else if (world_rank == 1) {
     MPI_Recv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
@@ -75,6 +82,7 @@ int main(int argc, char *argv[]) {
     }
     free(h_data);
   }
+
 
   cudaDeviceSynchronize();
   cudaFree(d_data);

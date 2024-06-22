@@ -5,7 +5,7 @@
 
 // CHECK-NOT: ThreadSanitizer: data race
 // CHECK-NOT: Thread T{{[0-9]+}} 'cuda_stream'
-// CHECK-NOT: [ERROR]
+// CHECK-NOT: [Error]
 
 #include "../support/gpu_mpi.h"
 
@@ -49,7 +49,6 @@ int main(int argc, char *argv[]) {
   int *d_data;
   cudaMalloc(&d_data, size * sizeof(int));
 
-  // Create a CUDA stream
   cudaStream_t stream;
   cudaStreamCreate(&stream);
 

@@ -2,10 +2,10 @@ called_from_lib:libmpi_cxx*
 called_from_lib:libmpi.so*
 called_from_lib:libcuda.so*
 
-# Probably not required, from previous experiments
+# From previous experiments:
 #called_from_lib:libucx*
 called_from_lib:libucp*
-called_from_lib:libucs*
+called_from_lib:*libucs*
 #called_from_lib:libucm_cuda.so*
 called_from_lib:libucm.so*
 called_from_lib:libuct_ib.so.0

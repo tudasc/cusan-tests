@@ -159,6 +159,7 @@ endfunction()
 
 set(CUTESTS_SUITES
   all
+  staging
   cuda-to-mpi
 )
 
