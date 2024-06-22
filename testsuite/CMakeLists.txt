@@ -6,22 +6,6 @@ endif()
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 
-find_library(lib_cucorr_interceptor
-    NAMES CucorrMPIInterceptor
-    PATHS ${CUCORR_PATH}/lib ${CUCORR_PATH}
-
-    REQUIRED
-    NO_DEFAULT_PATH
-)
-
-find_library(lib_cucorr_runtime
-    NAMES CucorrRuntime
-    PATHS ${CUCORR_PATH}/lib ${CUCORR_PATH}
-    REQUIRED
-    NO_DEFAULT_PATH
-)
-
-
 function(cutests_find_llvm_progs target names)
   cmake_parse_arguments(ARG "ABORT_IF_MISSING;SHOW_VAR" "DEFAULT_EXE" "HINTS" ${ARGN})
   set(TARGET_TMP ${target})

@@ -30,11 +30,27 @@ find_program(cucorr_mpicc
     PATHS ${CUCORR_PATH} ${CUCORR_PATH}/bin
     REQUIRED
 )
-#set(cucorr_mpicxx ${CUCORR_PATH}/bin/cucorr-mpic++)
-#set(cucorr_mpicc ${CUCORR_PATH}/bin/cucorr-mpicc)
+find_library(lib_cucorr_runtime
+    NAMES CucorrRuntime
+    PATHS ${CUCORR_PATH}/lib ${CUCORR_PATH}
+    REQUIRED
+    NO_DEFAULT_PATH
+)
+
+find_library(lib_cucorr_interceptor
+    NAMES CucorrMPIInterceptor
+    PATHS ${CUCORR_PATH}/lib ${CUCORR_PATH}
+
+    REQUIRED
+    NO_DEFAULT_PATH
+)
 
 message(STATUS "cucorr mpicc wrapper is set to ${cucorr_mpicc}")
 message(STATUS "cucorr mpicxx wrapper is set to ${cucorr_mpicxx}")
+message(STATUS "cucorr lib is set to ${lib_cucorr_runtime}")
+message(STATUS "cucorr lib is set to ${lib_cucorr_interceptor}")
 
 enable_testing()
 add_subdirectory(testsuite)
+
+add_subdirectory(jacobi/scripts)

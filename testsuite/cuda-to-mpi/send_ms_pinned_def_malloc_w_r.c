@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
   if (world_rank == 0) {
     int *h_pinned_data;
-    const int pinned_size=1;//1024 * size * sizeof(int);
+    const int pinned_size=sizeof(int);//1024 * size * sizeof(int);
     cudaMallocHost((void **) &h_pinned_data, pinned_size);
 
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);

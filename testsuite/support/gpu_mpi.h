@@ -2,6 +2,7 @@
 #define CUTESTS_GPUAWAREMPI_H
 
 // clang-format off
+#include <cuda_runtime.h>
 #include <mpi.h>
 #include <mpi-ext.h>
 #include <stdbool.h>

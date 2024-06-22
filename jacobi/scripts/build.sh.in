@@ -1,0 +1,11 @@
+#!/bin/bash
+
+export TYPEART_TYPE_FILE="@CUCORR_YAML_DIR@/types-jacobi.yaml"
+export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-jacobi.yaml"
+
+export CUCORR_MPICXX_EXEC="@cucorr_mpicxx@"
+export CUCORR_MPICC_EXEC="@cucorr_mpicc@"
+
+touch $TYPEART_TYPE_FILE
+touch $CUCORR_KERNEL_DATA_FILE
+make all -j 1

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export TYPEART_TYPE_FILE="@CUCORR_YAML_DIR@/types-jacobi.yaml"
+export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-jacobi.yaml"
+
+export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppression-lb2.txt"
+
+LD_PRELOAD="@lib_cucorr_interceptor@" mpiexec -np 2 ./bin/jacobi_cuda_normal_mpi -t 2 1
