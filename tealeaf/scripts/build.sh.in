@@ -23,4 +23,4 @@ CUCORR_WRAPPER=OFF cmake . \
               -DENABLE_MPI=ON -B"${build_dir}" -DMODEL=cuda -DCUDA_ARCH=sm_70 -DCMAKE_BUILD_TYPE=Release \
               -DMODEL=cuda -DCMAKE_CUDA_COMPILER=$CUCORR_MPICXX_EXEC -DCMAKE_CXX_COMPILER=$CUCORR_MPICXX_EXEC  -DCMAKE_C_COMPILER=$CUCORR_MPICC_EXEC
 
-cmake --build "${build_dir}" -- -j1
+cmake --build "${build_dir}" --clean-first -- -j1

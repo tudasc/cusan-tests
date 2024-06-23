@@ -73,6 +73,12 @@ if (SANITIZE)
 endif ()
 
 
+set(THREAD_SANITIZER OFF)
+if (THREAD_SANITIZER)
+    set(CXX_EXTRA_FLAGS -fsanitize=thread -g)
+    set(CXX_EXTRA_LINK_FLAGS -fsanitize=thread)
+endif ()
+
 # the final executable name
 set(EXE_NAME tealeaf)
 

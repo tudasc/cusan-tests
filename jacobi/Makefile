@@ -30,7 +30,7 @@ MPILD=$(PREP) ${CUCORR_MPICXX_EXEC}
 NVCC=$(PREP) ${CUCORR_MPICXX_EXEC}
 
 # Flags
-CFLAGS=-std=c99 -O3 -march=native -Wall -fsanitize=thread -g
+CFLAGS=-std=c99 -O3 -march=native -Wall -g
 MPICFLAGS=-I${MPI_HOME}/include
 CUDACFLAGS=-I${CUDA_INSTALL_PATH}/include
 
@@ -41,12 +41,13 @@ BINDIR=./bin
 JACOBI_CUDA_NORMAL_MPI=$(BINDIR)/jacobi_cuda_normal_mpi
 JACOBI_CUDA_AWARE_MPI=$(BINDIR)/jacobi_cuda_aware_mpi
 BINARIES=$(JACOBI_CUDA_NORMAL_MPI) $(JACOBI_CUDA_AWARE_MPI)
+BINARIES_VANILLA=$(JACOBI_CUDA_NORMAL_MPI)_vanilla $(JACOBI_CUDA_AWARE_MPI)_vanilla
 
 # Commands
 all: $(BINARIES)
 
 device.o: Jacobi.h Device.cu Makefile
-	$(NVCC) $(MPICFLAGS) $(CUDACFLAGS) -fsanitize=thread --cuda-gpu-arch=sm_72 -c Device.cu -o device.o
+	$(NVCC) $(MPICFLAGS) $(CUDACFLAGS) --cuda-gpu-arch=sm_72 -c Device.cu -o device.o
 
 input.o: Jacobi.h Input.c Makefile
 	$(MPICC) $(MPICFLAGS) $(CUDACFLAGS) $(CFLAGS) -c Input.c -o input.o
@@ -65,14 +66,14 @@ cuda_aware_mpi.o: Jacobi.h CUDA_Aware_MPI.c Makefile
 
 $(JACOBI_CUDA_NORMAL_MPI): jacobi.o input.o host.o device.o cuda_normal_mpi.o Makefile
 	mkdir -p $(BINDIR)
-	$(MPILD) -o $(JACOBI_CUDA_NORMAL_MPI) -fsanitize=thread jacobi.o input.o host.o device.o  cuda_normal_mpi.o $(CUDALDFLAGS)
+	$(MPILD) -o $(JACOBI_CUDA_NORMAL_MPI) jacobi.o input.o host.o device.o  cuda_normal_mpi.o $(CUDALDFLAGS)
 	
 $(JACOBI_CUDA_AWARE_MPI): jacobi.o input.o host.o device.o cuda_aware_mpi.o Makefile
 	mkdir -p $(BINDIR)
-	$(MPILD) -o $(JACOBI_CUDA_AWARE_MPI) -fsanitize=thread jacobi.o input.o host.o device.o cuda_aware_mpi.o $(CUDALDFLAGS)
+	$(MPILD) -o $(JACOBI_CUDA_AWARE_MPI) jacobi.o input.o host.o device.o cuda_aware_mpi.o $(CUDALDFLAGS)
 
 doc: CUDA_Normal_MPI.c CUDA_Aware_MPI.c Device.cu Host.c Input.c Makefile Jacobi.c Jacobi.h Jacobi.doxygen
 	doxygen Jacobi.doxygen
 	
 clean:
-	rm -rf *.o *~ $(BINARIES) *.yaml *.fatbin *.ptx
+	rm -rf *.o *~ $(BINARIES) $(BINARIES_VANILLA) *.yaml *.fatbin *.ptx
