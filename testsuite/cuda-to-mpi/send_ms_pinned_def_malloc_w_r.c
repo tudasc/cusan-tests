@@ -9,7 +9,7 @@
 
 #include "../support/gpu_mpi.h"
 
-#include <unistd.h>
+
 
 __global__ void kernel(int *arr, const int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -55,7 +55,10 @@ int main(int argc, char *argv[]) {
   if (world_rank == 0) {
     int *h_pinned_data;
     const int pinned_size=sizeof(int);//1024 * size * sizeof(int);
-    cudaMallocHost((void **) &h_pinned_data, pinned_size);
+    if(cudaMallocHost((void **) &h_pinned_data, pinned_size) != cudaSuccess) {
+        printf("[Alloc] Allocating pinned memory.\n");
+    }
+    cudaDeviceSynchronize();
 
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
     cudaMemset(h_pinned_data, 1, pinned_size); // memset is sync due to pinned host mem. 

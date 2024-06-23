@@ -9,7 +9,7 @@
 
 #include "../support/gpu_mpi.h"
 
-#include <unistd.h>
+
 
 __global__ void kernel(int *arr, const int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -52,6 +52,9 @@ int main(int argc, char *argv[]) {
   // Create a CUDA stream
   cudaStream_t stream;
   cudaStreamCreate(&stream);
+
+  cudaMemsetAsync(d_data,1,size*sizeof(int), stream);
+  cudaStreamSynchronize(stream);
 
   if (world_rank == 0) {
     kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(d_data, size);

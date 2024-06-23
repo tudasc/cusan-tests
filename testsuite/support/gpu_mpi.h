@@ -7,6 +7,7 @@
 #include <mpi-ext.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <unistd.h>
 // clang-format on
 
 #ifdef __cplusplus

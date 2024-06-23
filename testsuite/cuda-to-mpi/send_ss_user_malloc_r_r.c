@@ -21,7 +21,7 @@ __global__ void kernel(int* sum, int *arr, const int N) {
 #else
     printf("[Error] __CUDA_ARCH__ !\n");
 #endif
-    *sum += arr[tid] + (tid + 1);
+    sum[tid] = arr[tid] + (tid + 1);
   }
 }
 
@@ -50,8 +50,6 @@ int main(int argc, char *argv[]) {
   int *d_data;
   cudaMalloc(&d_data, size * sizeof(int));
   
-  
-
   // Create a CUDA stream
   cudaStream_t stream;
   cudaStreamCreate(&stream);
@@ -61,7 +59,7 @@ int main(int argc, char *argv[]) {
 
   if (world_rank == 0) {
     int* d_sum;
-    cudaMalloc(&d_sum, sizeof(int));
+    cudaMalloc(&d_sum, size*sizeof(int));
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_sum, d_data, size);
     // OK: kernel and MPI only read d_data
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);

@@ -8,7 +8,7 @@
 
 #include "../support/gpu_mpi.h"
 
-#include <unistd.h>
+
 
 __global__ void kernel(int *arr, const int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -47,6 +47,8 @@ int main(int argc, char *argv[]) {
 
   int *d_data;
   cudaMalloc(&d_data, size * sizeof(int));
+  cudaMemset(d_data,0,size*sizeof(int));
+  cudaDeviceSynchronize();
 
   if (world_rank == 0) {
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);

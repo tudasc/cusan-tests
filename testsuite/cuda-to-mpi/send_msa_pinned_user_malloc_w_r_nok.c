@@ -9,7 +9,7 @@
 
 #include "../support/gpu_mpi.h"
 
-#include <unistd.h>
+
 
 __global__ void kernel(int *arr, const int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -50,7 +50,6 @@ int main(int argc, char *argv[]) {
   int *d_data;
   cudaMalloc(&d_data, size * sizeof(int));
   cudaMemset(d_data,0,size*sizeof(int));
-
   cudaDeviceSynchronize();
 
   cudaStream_t stream;
@@ -61,7 +60,11 @@ int main(int argc, char *argv[]) {
     cudaStreamCreate(&stream_ms);
     int *h_pinned_data;
     const int pinned_size=1024 * size * sizeof(int);
-    cudaMallocHost((void **) &h_pinned_data, pinned_size);
+    if(cudaMallocHost((void **) &h_pinned_data, pinned_size) != cudaSuccess) {
+        printf("[Alloc] Allocating pinned memory.\n");
+        
+    }
+    cudaDeviceSynchronize();
 
     kernel<<<blocksPerGrid, threadsPerBlock,0,stream>>>(d_data, size);
     cudaMemsetAsync(h_pinned_data, 1, pinned_size, stream_ms);
