@@ -16,3 +16,8 @@ if [ ! -z "$preflag" ]; then
 fi
 
 make all -j 1
+
+if [ ! -z "$preflag" ]; then
+  mv bin/jacobi_cuda_aware_mpi bin/jacobi_cuda_aware_mpi_vanilla
+  mv bin/jacobi_cuda_normal_mpi bin/jacobi_cuda_normal_mpi_vanilla
+fi

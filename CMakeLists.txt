@@ -54,3 +54,4 @@ enable_testing()
 add_subdirectory(testsuite)
 
 add_subdirectory(jacobi/scripts)
+add_subdirectory(tealeaf/scripts)
