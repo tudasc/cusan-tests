@@ -12,7 +12,7 @@ General: MPI call,Synchronization Calls,Stream Semantics,Memory Allocation,CUDA 
 - eq (EventQuery)
 
 #### Synchronization (Implicit)
-- ds (DeviceSynchronize)
+
 - ms(a) (Memset(Async))
 - mc(a) (Memcopy(Async))
 

@@ -50,16 +50,28 @@ int main(int argc, char *argv[]) {
   cudaDeviceSynchronize();
 
   if (world_rank == 0) {
-    int *d_sum;
-    cudaMalloc(&d_sum, size * sizeof(int));
-    kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
-    cudaMemset(
-        d_sum, 1,
-        size *
-            sizeof(
-                int)); // memset is async, except when d_sum is pinned host mem.
+    cudaStream_t stream1;
+    // cudaStream_t stream2;
+    cudaStreamCreate(&stream1);
+    // cudaStreamCreate(&stream2);
+    int *d_data2;
+    cudaMalloc(&d_data2, size * sizeof(int));
+    int *d_data3;
+    cudaMalloc(&d_data3, size * sizeof(int));
+    cudaMemsetAsync(d_data3, 0, sizeof(int) * size, stream1);
+    cudaStreamSynchronize(stream1);
+
+    kernel<<<blocksPerGrid, threadsPerBlock, 0, stream1>>>(d_data, size);
+    // https://docs.nvidia.com/cuda/cuda-runtime-api/api-sync-behavior.html#api-sync-behavior__memcpy-async
+    // "For all other transfers, the function should be fully asynchronous."
+    cudaMemcpyAsync(d_data2, d_data3, size * sizeof(int),
+                    cudaMemcpyDeviceToDevice, stream1);
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
-    cudaFree(d_sum);
+
+    cudaStreamSynchronize(stream1);
+    cudaStreamDestroy(stream1);
+    cudaFree(d_data2);
+    cudaFree(d_data3);
   } else if (world_rank == 1) {
     MPI_Recv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }

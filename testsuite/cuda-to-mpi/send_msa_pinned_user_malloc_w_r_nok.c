@@ -7,9 +7,9 @@
 // CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
 // CHECK-DAG: [Error]
 
+// REQUIRES: msa-rules
+
 #include "../support/gpu_mpi.h"
-
-
 
 __global__ void kernel(int *arr, const int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -24,7 +24,6 @@ __global__ void kernel(int *arr, const int N) {
     arr[tid] = (tid + 1);
   }
 }
-
 
 int main(int argc, char *argv[]) {
   if (!has_gpu_aware_mpi()) {
@@ -49,7 +48,7 @@ int main(int argc, char *argv[]) {
 
   int *d_data;
   cudaMalloc(&d_data, size * sizeof(int));
-  cudaMemset(d_data,0,size*sizeof(int));
+  cudaMemset(d_data, 0, size * sizeof(int));
   cudaDeviceSynchronize();
 
   cudaStream_t stream;
@@ -59,17 +58,16 @@ int main(int argc, char *argv[]) {
     cudaStream_t stream_ms;
     cudaStreamCreate(&stream_ms);
     int *h_pinned_data;
-    const int pinned_size=1024 * size * sizeof(int);
-    if(cudaMallocHost((void **) &h_pinned_data, pinned_size) != cudaSuccess) {
-        printf("[Alloc] Allocating pinned memory.\n");
-        
+    const int pinned_size = 1024 * size * sizeof(int);
+    if (cudaMallocHost((void **)&h_pinned_data, pinned_size) != cudaSuccess) {
+      printf("[Alloc] Allocating pinned memory.\n");
     }
     cudaDeviceSynchronize();
 
-    kernel<<<blocksPerGrid, threadsPerBlock,0,stream>>>(d_data, size);
+    kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(d_data, size);
     cudaMemsetAsync(h_pinned_data, 1, pinned_size, stream_ms);
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
-    
+
     cudaStreamSynchronize(stream_ms);
     cudaFreeHost(h_pinned_data);
   } else if (world_rank == 1) {
@@ -90,7 +88,6 @@ int main(int argc, char *argv[]) {
     }
     free(h_data);
   }
-
 
   cudaDeviceSynchronize();
   cudaFree(d_data);

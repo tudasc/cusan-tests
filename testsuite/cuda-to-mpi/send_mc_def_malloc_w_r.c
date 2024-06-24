@@ -3,9 +3,9 @@
 // RUN: %cucorr-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
-// CHECK-DAG: ThreadSanitizer: data race
-// CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
-// CHECK-DAG: [Error]
+// CHECK-NOT: ThreadSanitizer: data race
+// CHECK-NOT: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-NOT: [Error]
 
 #include "../support/gpu_mpi.h"
 
@@ -50,16 +50,13 @@ int main(int argc, char *argv[]) {
   cudaDeviceSynchronize();
 
   if (world_rank == 0) {
-    int *d_sum;
-    cudaMalloc(&d_sum, size * sizeof(int));
+    int *h_data = (int *)malloc(size * sizeof(int));
+
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
-    cudaMemset(
-        d_sum, 1,
-        size *
-            sizeof(
-                int)); // memset is async, except when d_sum is pinned host mem.
+    cudaMemcpy(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost);
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
-    cudaFree(d_sum);
+
+    free(h_data);
   } else if (world_rank == 1) {
     MPI_Recv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }

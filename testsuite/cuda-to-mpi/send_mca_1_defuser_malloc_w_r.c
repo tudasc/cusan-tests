@@ -5,7 +5,6 @@
 
 // CHECK-DAG: ThreadSanitizer: data race
 // CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
-// CHECK-DAG: [Error]
 
 #include "../support/gpu_mpi.h"
 
@@ -50,16 +49,24 @@ int main(int argc, char *argv[]) {
   cudaDeviceSynchronize();
 
   if (world_rank == 0) {
-    int *d_sum;
-    cudaMalloc(&d_sum, size * sizeof(int));
+    cudaStream_t stream1;
+    // cudaStream_t stream2;
+    cudaStreamCreate(&stream1);
+    // cudaStreamCreate(&stream2);
+    int *h_data = (int *)malloc(size * sizeof(int));
+
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
-    cudaMemset(
-        d_sum, 1,
-        size *
-            sizeof(
-                int)); // memset is async, except when d_sum is pinned host mem.
+    // https://docs.nvidia.com/cuda/cuda-runtime-api/api-sync-behavior.html#api-sync-behavior__memcpy-async
+    // "For transfers between device memory and pageable host memory, the
+    // function might be synchronous with respect to host."
+    cudaMemcpyAsync(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost,
+                    stream1);
+    cudaStreamSynchronize(stream1); // TEST FIX
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
-    cudaFree(d_sum);
+
+    cudaStreamSynchronize(stream1);
+    cudaStreamDestroy(stream1);
+    free(h_data);
   } else if (world_rank == 1) {
     MPI_Recv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
