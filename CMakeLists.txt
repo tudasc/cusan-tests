@@ -45,12 +45,20 @@ find_library(lib_cucorr_interceptor
     NO_DEFAULT_PATH
 )
 
+find_program(must_run
+    mustrun
+    PATHS ${MUST_PATH} ${MUST_PATH}/bin
+)
+
 message(STATUS "cucorr mpicc wrapper is set to ${cucorr_mpicc}")
 message(STATUS "cucorr mpicxx wrapper is set to ${cucorr_mpicxx}")
 message(STATUS "cucorr lib is set to ${lib_cucorr_runtime}")
 message(STATUS "cucorr interceptor lib is set to ${lib_cucorr_interceptor}")
+message(STATUS "MUST mustrun is set to ${must_run}")
 
 enable_testing()
+
+add_subdirectory(support)
 add_subdirectory(testsuite)
 
 add_subdirectory(jacobi/scripts)

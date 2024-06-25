@@ -76,4 +76,7 @@ doc: CUDA_Normal_MPI.c CUDA_Aware_MPI.c Device.cu Host.c Input.c Makefile Jacobi
 	doxygen Jacobi.doxygen
 	
 clean:
-	rm -rf *.o *~ $(BINARIES) $(BINARIES_VANILLA) *.yaml *.fatbin *.ptx
+	rm -rf *.o *~ *.yaml *.fatbin *.ptx
+
+veryclean:
+	$(BINARIES) $(BINARIES_VANILLA)

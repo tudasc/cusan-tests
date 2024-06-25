@@ -1,0 +1,44 @@
+#!/bin/bash
+
+#SBATCH -A project02416
+#SBATCH -J cucorr_jacobi
+#SBATCH -e /work/projects/project02416/jacobi_outputs/%x.err.%j
+#SBATCH -o /work/projects/project02416/jacobi_outputs/%x.err.%j
+# CPU
+#SBATCH -N 2                  # 2 Nodes
+#SBATCH -n 96                 # 1 Task
+#SBATCH -c 1                  # 1 CPU/Task
+#SBATCH --mem-per-cpu=1750    
+#SBATCH -t 00:30:00           
+# GPU
+#SBATCH --gres=gpu:v100:1     # 1 GPU NVidia "Volta 100"
+
+module purge
+ml gcc/11 openmpi git python
+ml clang/14
+
+export CC=clang
+export CXX=clang++
+
+nvidia-smi 1>&2
+
+export OMP_PROC_BIND=close
+export OMP_PLACES=threads
+export OMP_NUM_THREADS=1
+
+export TYPEART_TYPE_FILE="@CUCORR_YAML_DIR@/types-jacobi.yaml"
+export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-jacobi.yaml"
+
+export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppression-lb2.txt"
+
+bench_base_path=/work/projects/project02416/jacobi_outputs
+
+for i in `seq 1 1`;
+  srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n 2 .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-%j.txt
+done
+
+for i in `seq 1 1`;
+  srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n 2 .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-cucorr-%j.txt
+done
+
+# env MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket" mustrun -n 2
