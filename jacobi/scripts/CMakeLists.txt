@@ -28,8 +28,20 @@ function(add_build_clean_target name dir)
         DEPENDS cutest_memusage
     )
 
+    add_custom_target(${name}-tsan-vanilla-build
+        COMMAND "make" clean
+        COMMAND ./build.sh CUCORR_WRAPPER=OFF -fsanitize=thread
+        WORKING_DIRECTORY ${dir}
+        DEPENDS cutest_memusage
+    )
+
     add_custom_target(${name}-clean
         COMMAND "make" clean
+        WORKING_DIRECTORY ${dir}
+    )
+
+    add_custom_target(${name}-veryclean
+        COMMAND "make" veryclean
         WORKING_DIRECTORY ${dir}
     )
 
@@ -56,13 +68,17 @@ configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/run.sh.in
   ${CMAKE_CURRENT_SOURCE_DIR}/../run.sh
   )
 
-set(CUTEST_JACOBI_CUCORR ${PROJECT_SOURCE_DIR}/jacobi/bin/jacobi_cuda_aware_mpi)
-set(CUTEST_JACOBI_VANILLA ${CUTEST_JACOBI_CUCORR}_vanilla)
-set(CUTEST_JACOBI_ARGS "-t 2 1")
-configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/sbatch.sh.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/../sbatch.sh
-  )
+function (make_sbatch)
+  set(CUTEST_JACOBI_CUCORR ${PROJECT_SOURCE_DIR}/jacobi/bin/jacobi_cuda_aware_mpi)
+  set(CUTEST_JACOBI_VANILLA ${CUTEST_JACOBI_CUCORR}_vanilla)
+  set(CUTEST_JACOBI_TSAN_VANILLA ${CUTEST_JACOBI_CUCORR}_tsan_vanilla)
+  set(CUTEST_JACOBI_ARGS "-t 2 1")
+  configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/sbatch.sh.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sbatch.sh
+    )
+endfunction()
 
+make_sbatch()
 
 add_build_clean_target(jacobi
     ${PROJECT_SOURCE_DIR}/jacobi

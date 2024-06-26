@@ -20,8 +20,6 @@ ml clang/14
 export CC=clang
 export CXX=clang++
 
-nvidia-smi 1>&2
-
 export OMP_PROC_BIND=close
 export OMP_PLACES=threads
 export OMP_NUM_THREADS=1
@@ -32,13 +30,40 @@ export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-jacobi.yaml"
 export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppression-lb2.txt"
 
 bench_base_path=/work/projects/project02416/jacobi_outputs
+num_p=2
 
+mkdir -p "$bench_base_path"
+
+nvidia-smi 1>&2
+
+# Without any modifications (vanilla)
 for i in `seq 1 1`;
-  srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n 2 .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-%j.txt
+  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-%j.txt
 done
 
+# Vanilla with Tsan
 for i in `seq 1 1`;
-  srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n 2 .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-cucorr-%j.txt
+  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-tsan-%j.txt
 done
 
-# env MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket" mustrun -n 2
+# MUST on vanilla (no Tsan)
+for i in `seq 1 1`;
+  /usr/bin/time -f "Time=%e" mustrun --must:printmem --must:mpiexec srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -np $num_p .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-%j.txt
+done
+
+# MUST-Tsan on vanilla
+for i in `seq 1 1`;
+  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem --must:mpiexec srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -np $num_p .@CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-tsan-%j.txt
+done
+
+# Cucorr instrumentation
+for i in `seq 1 1`;
+  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-cucorr-%j.txt
+10done!
+
+# Full: MUST+Cucorr instrumentation
+for i in `seq 1 1`;
+  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem --must:mpiexec srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -np $num_p .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr-%j.txt
+done
+
+# env MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket" mustrun -n $num_p

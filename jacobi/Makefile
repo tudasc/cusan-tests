@@ -30,11 +30,11 @@ MPILD=$(PREP) ${CUCORR_MPICXX_EXEC}
 NVCC=$(PREP) ${CUCORR_MPICXX_EXEC}
 
 # Flags
-CFLAGS=-std=c99 -O3 -march=native -Wall -g
+CFLAGS=-std=c99 -O3 -march=native -Wall -g ${CUTEST_ADDITIONAL_CFLAGS}
 MPICFLAGS=-I${MPI_HOME}/include
 CUDACFLAGS=-I${CUDA_INSTALL_PATH}/include
 
-CUDALDFLAGS=-L${CUDA_INSTALL_PATH}/lib64 -lcudart
+CUDALDFLAGS=-L${CUDA_INSTALL_PATH}/lib64 -lcudart ${CUTEST_ADDITIONAL_CFLAGS}
 
 # Description of binaries
 BINDIR=./bin
@@ -42,6 +42,7 @@ JACOBI_CUDA_NORMAL_MPI=$(BINDIR)/jacobi_cuda_normal_mpi
 JACOBI_CUDA_AWARE_MPI=$(BINDIR)/jacobi_cuda_aware_mpi
 BINARIES=$(JACOBI_CUDA_NORMAL_MPI) $(JACOBI_CUDA_AWARE_MPI)
 BINARIES_VANILLA=$(JACOBI_CUDA_NORMAL_MPI)_vanilla $(JACOBI_CUDA_AWARE_MPI)_vanilla
+BINARIES_TSAN_VANILLA=$(JACOBI_CUDA_NORMAL_MPI)_tsan_vanilla $(JACOBI_CUDA_AWARE_MPI)_tsan_vanilla
 
 # Commands
 all: $(BINARIES)
@@ -76,7 +77,7 @@ doc: CUDA_Normal_MPI.c CUDA_Aware_MPI.c Device.cu Host.c Input.c Makefile Jacobi
 	doxygen Jacobi.doxygen
 	
 clean:
-	rm -rf *.o *~ *.yaml *.fatbin *.ptx
+	rm -rf *.o *~ *.fatbin *.ptx
 
 veryclean:
-	$(BINARIES) $(BINARIES_VANILLA)
+	$(BINARIES) $(BINARIES_VANILLA) $(BINARIES_TSAN_VANILLA) *.yaml
