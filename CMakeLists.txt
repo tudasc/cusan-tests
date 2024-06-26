@@ -47,7 +47,7 @@ find_library(lib_cucorr_interceptor
 
 find_program(must_run
     mustrun
-    PATHS ${MUST_PATH} ${MUST_PATH}/bin
+    PATHS ${MUST_PATH} ${MUST_PATH}/bin ${PROJECT_SOURCE_DIR}/must-tsan/bin
 )
 
 message(STATUS "cucorr mpicc wrapper is set to ${cucorr_mpicc}")

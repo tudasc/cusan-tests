@@ -29,6 +29,8 @@ export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-jacobi.yaml"
 
 export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppression-lb2.txt"
 
+export MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket"
+
 bench_base_path=/work/projects/project02416/jacobi_outputs
 num_p=2
 
@@ -48,12 +50,12 @@ done
 
 # MUST on vanilla (no Tsan)
 for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:printmem --must:mpiexec srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -np $num_p .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-%j.txt
+  /usr/bin/time -f "Time=%e" @must_run@ --must:printmem -np $num_p .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-%j.txt
 done
 
 # MUST-Tsan on vanilla
 for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem --must:mpiexec srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -np $num_p .@CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-tsan-%j.txt
+  /usr/bin/time -f "Time=%e" @must_run@ --must:tsan --must:printmem -np $num_p .@CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-tsan-%j.txt
 done
 
 # Cucorr instrumentation
@@ -63,7 +65,5 @@ for i in `seq 1 1`;
 
 # Full: MUST+Cucorr instrumentation
 for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem --must:mpiexec srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -np $num_p .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr-%j.txt
+  /usr/bin/time -f "Time=%e" @must_run@ --must:tsan --must:printmem -np $num_p .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr-%j.txt
 done
-
-# env MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket" mustrun -n $num_p
