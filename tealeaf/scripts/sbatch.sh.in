@@ -1,0 +1,73 @@
+#!/bin/bash
+
+#SBATCH -A project02416
+#SBATCH -J cucorr_tealeaf
+#SBATCH -e /work/projects/project02416/tealeaf_outputs/%x.err.%j
+#SBATCH -o /work/projects/project02416/tealeaf_outputs/%x.err.%j
+# CPU
+#SBATCH -N 2                  # 2 Nodes
+#SBATCH -n 96                 # 1 Task
+#SBATCH -c 1                  # 1 CPU/Task
+#SBATCH --mem-per-cpu=1750    
+#SBATCH -t 00:30:00           
+# GPU
+#SBATCH --gres=gpu:v100:1     # 1 GPU NVidia "Volta 100"
+
+module purge
+ml gcc/11 cuda/11.5 openmpi/4.0.7 git python
+ml clang/14
+
+export CC=clang
+export CXX=clang++
+
+export OMP_PROC_BIND=close
+export OMP_PLACES=threads
+export OMP_NUM_THREADS=1
+
+export PATH="@MUST_BIN_DIR@":$PATH
+
+export TYPEART_TYPE_FILE="@CUCORR_YAML_DIR@/types-tealeaf.yaml"
+export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-tealeaf.yaml"
+
+export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppression-lb2.txt"
+
+export MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket"
+
+bench_base_path=/work/projects/project02416/tealeaf_outputs
+num_p=2
+
+mkdir -p "$bench_base_path"
+
+nvidia-smi 1>&2
+
+cd "@CUTEST_TEALEAF_CUCORR_BUILD_BASE@"/..
+
+# Without any modifications (vanilla)
+for i in `seq 1 1`;
+  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_TEALEAF_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-%j.txt
+done
+
+# Vanilla with Tsan
+for i in `seq 1 1`;
+  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-tsan-%j.txt
+done
+
+# MUST on vanilla (no Tsan)
+for i in `seq 1 1`;
+  /usr/bin/time -f "Time=%e" mustrun --must:printmem -np $num_p .@CUTEST_TEALEAF_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must-%j.txt
+done
+
+# MUST-Tsan on vanilla
+for i in `seq 1 1`;
+  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -np $num_p .@CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must-tsan-%j.txt
+done
+
+# Cucorr instrumentation
+for i in `seq 1 1`;
+  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-cucorr-%j.txt
+10done!
+
+# Full: MUST+Cucorr instrumentation
+for i in `seq 1 1`;
+  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -np $num_p .@CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-must-cucorr-%j.txt
+done

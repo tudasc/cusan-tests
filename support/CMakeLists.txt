@@ -21,3 +21,8 @@ add_custom_target(must-bootstrap
         COMMAND "./must-bootstrap.sh" ${MUST_BASE_PATH}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
+
+add_custom_target(cucorr-bootstrap
+    COMMAND "./cucorr-bootstrap.sh" ${MUST_BASE_PATH}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)

@@ -13,8 +13,7 @@
 # GPU
 #SBATCH --gres=gpu:v100:1     # 1 GPU NVidia "Volta 100"
 
-module purge
-ml gcc/11 openmpi git python
+ml gcc/11 cuda/11.5 openmpi/4.0.7 git python
 ml clang/14
 
 export CC=clang
@@ -23,6 +22,8 @@ export CXX=clang++
 export OMP_PROC_BIND=close
 export OMP_PLACES=threads
 export OMP_NUM_THREADS=1
+
+export PATH="@MUST_BIN_DIR@":$PATH
 
 export TYPEART_TYPE_FILE="@CUCORR_YAML_DIR@/types-jacobi.yaml"
 export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-jacobi.yaml"
@@ -50,12 +51,12 @@ done
 
 # MUST on vanilla (no Tsan)
 for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" @must_run@ --must:printmem -np $num_p .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-%j.txt
+  /usr/bin/time -f "Time=%e" mustrun --must:printmem -np $num_p .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-%j.txt
 done
 
 # MUST-Tsan on vanilla
 for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" @must_run@ --must:tsan --must:printmem -np $num_p .@CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-tsan-%j.txt
+  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -np $num_p .@CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-tsan-%j.txt
 done
 
 # Cucorr instrumentation
@@ -65,5 +66,5 @@ for i in `seq 1 1`;
 
 # Full: MUST+Cucorr instrumentation
 for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" @must_run@ --must:tsan --must:printmem -np $num_p .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr-%j.txt
+  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -np $num_p .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr-%j.txt
 done

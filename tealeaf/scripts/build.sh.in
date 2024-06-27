@@ -9,6 +9,8 @@ export CUCORR_MPICC_EXEC="@cucorr_mpicc@"
 touch $TYPEART_TYPE_FILE
 touch $CUCORR_KERNEL_DATA_FILE
 
+tsan_flag=OFF
+compile_threads=1
 
 build_dir="build_cucorr"
 preflag=$1
@@ -16,11 +18,18 @@ if [ ! -z "$preflag" ]; then
   export $preflag
   echo "Exported : $preflag"
   build_dir="build_vanilla"
+  compile_threads=16
+fi
+
+if [ ! -z "$2" ]; then
+  build_dir="build_tsan_vanilla"
+  tsan_flag=ON
+  compile_threads=16
 fi
 
 
-CUCORR_WRAPPER=OFF cmake . \
-              -DENABLE_MPI=ON -B"${build_dir}" -DMODEL=cuda -DCUDA_ARCH=sm_70 -DCMAKE_BUILD_TYPE=Release \
+CUCORR_WRAPPER=OFF cmake \
+              -DENABLE_MPI=ON -B"${build_dir}" -DMODEL=cuda -DCUDA_ARCH=sm_70 -DCMAKE_BUILD_TYPE=Release -DTHREAD_SANITIZER=$tsan_flag \
               -DMODEL=cuda -DCMAKE_CUDA_COMPILER=$CUCORR_MPICXX_EXEC -DCMAKE_CXX_COMPILER=$CUCORR_MPICXX_EXEC  -DCMAKE_C_COMPILER=$CUCORR_MPICC_EXEC
 
-cmake --build "${build_dir}" --clean-first -- -j1
+cmake --build "${build_dir}" --clean-first -- -j$compile_threads

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 module purge
-ml gcc/11 openmpi git python
+ml gcc/11 cuda/11.5 openmpi/4.0.7 git python
 ml clang/14
 
 export CC=clang
@@ -21,7 +21,7 @@ echo "Build to $build_f ; Install to $install_f"
 
 function must_fetch() {
     cd "$base_must_f"
-    git clone -b feature/integrate-handle-shim-with-fiber --single-branch --depth 1 https://git-ce.rwth-aachen.de/hpc-research/correctness/MUST.git must-tsan
+    git clone -b feature/integrate-handle-shim-with-fiber --single-branch https://git-ce.rwth-aachen.de/hpc-research/correctness/MUST.git must-tsan
     cd "$base_must_f"/must-tsan
     git submodule update --recursive --init
 }
@@ -45,3 +45,4 @@ must_install
 
 echo "##########"
 echo "Execute: export PATH="$install_f"/bin:\$PATH"
+echo "Execute: export MUST_PATH="$install_f""

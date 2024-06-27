@@ -23,12 +23,14 @@ find_package(MPI REQUIRED)
 find_program(cucorr_mpicxx
     cucorr-mpic++
     PATHS ${CUCORR_PATH} ${CUCORR_PATH}/bin
-    REQUIRED.
+    REQUIRED
+    NO_DEFAULT_PATH
 )
 find_program(cucorr_mpicc
     cucorr-mpicc
     PATHS ${CUCORR_PATH} ${CUCORR_PATH}/bin
     REQUIRED
+    NO_DEFAULT_PATH
 )
 find_library(lib_cucorr_runtime
     NAMES CucorrRuntime
@@ -40,14 +42,13 @@ find_library(lib_cucorr_runtime
 find_library(lib_cucorr_interceptor
     NAMES CucorrMPIInterceptor
     PATHS ${CUCORR_PATH}/lib ${CUCORR_PATH}
-
-    REQUIRED
     NO_DEFAULT_PATH
 )
 
 find_program(must_run
     mustrun
-    PATHS ${MUST_PATH} ${MUST_PATH}/bin ${PROJECT_SOURCE_DIR}/must-tsan/bin
+    PATHS ${MUST_PATH} ${MUST_PATH}/bin ${PROJECT_SOURCE_DIR}/must-tsan/install/bin
+    NO_DEFAULT_PATH
 )
 
 message(STATUS "cucorr mpicc wrapper is set to ${cucorr_mpicc}")

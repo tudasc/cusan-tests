@@ -19,7 +19,7 @@ fi
 
 if [ ! -z "$2" ]; then
   echo "Vanilla with ThreadSanitizer $2"
-  make all -j 1 CUTEST_ADDITIONAL_CFLAGS="$2"
+  make all -j 8 CUTEST_ADDITIONAL_CFLAGS="$2"
 else
   make all -j 1
 fi

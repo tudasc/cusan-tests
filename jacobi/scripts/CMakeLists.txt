@@ -35,6 +35,14 @@ function(add_build_clean_target name dir)
         DEPENDS cutest_memusage
     )
 
+    add_custom_target(${name}-all-build)
+
+    add_dependencies(${name}-all-build
+        ${name}-build
+        ${name}-vanilla-build
+        ${name}-tsan-vanilla-build
+    )
+
     add_custom_target(${name}-clean
         COMMAND "make" clean
         WORKING_DIRECTORY ${dir}
@@ -73,6 +81,9 @@ function (make_sbatch)
   set(CUTEST_JACOBI_VANILLA ${CUTEST_JACOBI_CUCORR}_vanilla)
   set(CUTEST_JACOBI_TSAN_VANILLA ${CUTEST_JACOBI_CUCORR}_tsan_vanilla)
   set(CUTEST_JACOBI_ARGS "-t 2 1")
+
+  get_filename_component(MUST_BIN_DIR "${must_run}" DIRECTORY ABSOLUTE)
+
   configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/sbatch.sh.in
     ${CMAKE_CURRENT_SOURCE_DIR}/../sbatch.sh
     )
