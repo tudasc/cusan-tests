@@ -16,9 +16,8 @@ called_from_lib:libevent_pthreads-2.1.so*
 called_from_lib:libevent_core-2.1.so*
 #called_from_lib:libhfi1verbs-rdmav34.so*
 called_from_lib:libopen-pal.so.40*
-called_from_lib:mca_errmgr_default_app.so*
 called_from_lib:mca_gds_hash.so*
-called_from_lib:mca_ptl_tcp.so*
+#called_from_lib:mca_ptl_tcp.so*
 called_from_lib:mca_bfrops_v20.so*
 #called_from_lib:mca_psec_munge.so*
 called_from_lib:mca_gds_ds21.so*
@@ -28,3 +27,6 @@ called_from_lib:ld-linux-x86-64.so*
 called_from_lib:libmlx5-rdma*
 called_from_lib:libnvidia-ml.so.1
 
+race:mca_errmgr_default_app.so*
+mutex:mca_errmgr_default_app.so*
+mutex:mca_ptl_tcp.so*

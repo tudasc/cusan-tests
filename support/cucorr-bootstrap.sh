@@ -1,7 +1,7 @@
 #!/bin/bash
 
 module purge
-ml gcc/11 cuda/11.5 openmpi/4.0.7 git python
+ml gcc/11 cuda openmpi git python
 ml clang/14
 
 export CC=clang
