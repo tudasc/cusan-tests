@@ -19,4 +19,4 @@ General: MPI call,Synchronization Calls,Stream Semantics,Memory Allocation,CUDA 
 #### Stream Semantics
 - def (Default stream)
 - defuser (Default stream and user defined stream)
-- user (User defined stream)*for stopm
+- user (User defined stream)
