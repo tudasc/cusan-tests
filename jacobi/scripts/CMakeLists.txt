@@ -87,6 +87,11 @@ function (make_sbatch)
   configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/sbatch.sh.in
     ${CMAKE_CURRENT_SOURCE_DIR}/../sbatch.sh
     )
+  add_custom_target(jacobi-sbatch
+    COMMAND sbatch sbatch.sh
+    COMMAND squeue
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/jacobi
+  )
 endfunction()
 
 make_sbatch()

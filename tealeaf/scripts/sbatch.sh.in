@@ -44,12 +44,12 @@ cd "@CUTEST_TEALEAF_CUCORR_BUILD_BASE@"/..
 
 # Without any modifications (vanilla)
 for i in `seq 1 1`;
-  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_TEALEAF_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-%j.txt
+  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_TEALEAF_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-%j.txt
 done
 
 # Vanilla with Tsan
 for i in `seq 1 1`;
-  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-tsan-%j.txt
+  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-tsan-%j.txt
 done
 
 # MUST on vanilla (no Tsan)
@@ -64,7 +64,7 @@ done
 
 # Cucorr instrumentation
 for i in `seq 1 1`;
-  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-cucorr-%j.txt
+  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-cucorr-%j.txt
 10done!
 
 # Full: MUST+Cucorr instrumentation

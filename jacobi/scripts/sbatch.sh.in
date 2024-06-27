@@ -41,12 +41,12 @@ nvidia-smi 1>&2
 
 # Without any modifications (vanilla)
 for i in `seq 1 1`;
-  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-%j.txt
+  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-%j.txt
 done
 
 # Vanilla with Tsan
 for i in `seq 1 1`;
-  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-tsan-%j.txt
+  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-tsan-%j.txt
 done
 
 # MUST on vanilla (no Tsan)
@@ -61,7 +61,7 @@ done
 
 # Cucorr instrumentation
 for i in `seq 1 1`;
-  LD_PRELOAD=$<TARGET_FILE:cutest_memusage> /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-cucorr-%j.txt
+  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-cucorr-%j.txt
 10done!
 
 # Full: MUST+Cucorr instrumentation

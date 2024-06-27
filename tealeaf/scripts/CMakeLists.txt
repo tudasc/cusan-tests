@@ -78,6 +78,11 @@ function (make_sbatch)
   configure_tealeaf_cfg(${CMAKE_CURRENT_SOURCE_DIR}/sbatch.sh.in
     ${CMAKE_CURRENT_SOURCE_DIR}/../sbatch.sh
     )
+  add_custom_target(tealeaf-sbatch
+    COMMAND sbatch sbatch.sh
+    COMMAND squeue
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tealeaf
+  )
 endfunction()
 
 make_sbatch()

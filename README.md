@@ -37,6 +37,7 @@ In [root level](./) created `build` folder `cmake ..` generates:
     - `make jacobi-all-build`: builds vanilla, vanilla-tsan, cucorr
     - `make jacobi-run` or `make jacobi-vanilla-run`: Run on current node
 - [`sbatch.sh`](jacobi/scripts/sbatch.sh.in): To run on compute node (requires `make jacobi-all-build` to be run)
+    - `make jacobi-sbatch`: Slurm commit generated as sbatch
 
 ### TeaLeaf Targets
 
@@ -45,3 +46,4 @@ In [root level](./) created `build` folder `cmake ..` generates:
     - `make tealeaf-all-build`: builds vanilla, vanilla-tsan, cucorr
     - `make tealeaf-run` or `make tealeaf-vanilla-run`: Run on current node
 - [`sbatch.sh`](tealeaf/scripts/sbatch.sh.in): To run on compute node (requires `make tealeaf-all-build` to be run)
+    - `make tealeaf-sbatch`: Slurm commit generated as sbatch
