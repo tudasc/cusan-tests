@@ -43,12 +43,13 @@ JACOBI_CUDA_AWARE_MPI=$(BINDIR)/jacobi_cuda_aware_mpi
 BINARIES=$(JACOBI_CUDA_NORMAL_MPI) $(JACOBI_CUDA_AWARE_MPI)
 BINARIES_VANILLA=$(JACOBI_CUDA_NORMAL_MPI)_vanilla $(JACOBI_CUDA_AWARE_MPI)_vanilla
 BINARIES_TSAN_VANILLA=$(JACOBI_CUDA_NORMAL_MPI)_tsan_vanilla $(JACOBI_CUDA_AWARE_MPI)_tsan_vanilla
+BINARIES_CUCORR=$(JACOBI_CUDA_NORMAL_MPI)_cucorr $(JACOBI_CUDA_AWARE_MPI)_cucorr
 
 # Commands
 all: $(BINARIES)
 
 device.o: Jacobi.h Device.cu Makefile
-	$(NVCC) $(MPICFLAGS) $(CUDACFLAGS) --cuda-gpu-arch=sm_72 -c Device.cu -o device.o
+	$(NVCC) $(MPICFLAGS) $(CUDACFLAGS) --cuda-gpu-arch=sm_70 -c Device.cu -o device.o
 
 input.o: Jacobi.h Input.c Makefile
 	$(MPICC) $(MPICFLAGS) $(CUDACFLAGS) $(CFLAGS) -c Input.c -o input.o
@@ -80,4 +81,4 @@ clean:
 	rm -rf *.o *~ *.fatbin *.ptx
 
 veryclean:
-	$(BINARIES) $(BINARIES_VANILLA) $(BINARIES_TSAN_VANILLA) *.yaml
+	$(BINARIES) $(BINARIES_VANILLA) $(BINARIES_TSAN_VANILLA) $(BINARIES_CUCORR) *.yaml

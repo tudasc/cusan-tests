@@ -39,6 +39,7 @@ function(add_build_clean_target name dir)
 
     add_dependencies(${name}-all-build
         ${name}-build
+
         ${name}-vanilla-build
         ${name}-tsan-vanilla-build
     )
@@ -77,9 +78,10 @@ configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/run.sh.in
   )
 
 function (make_sbatch)
-  set(CUTEST_JACOBI_CUCORR ${PROJECT_SOURCE_DIR}/jacobi/bin/jacobi_cuda_aware_mpi)
-  set(CUTEST_JACOBI_VANILLA ${CUTEST_JACOBI_CUCORR}_vanilla)
-  set(CUTEST_JACOBI_TSAN_VANILLA ${CUTEST_JACOBI_CUCORR}_tsan_vanilla)
+  set(CUTEST_JACOBI_BASEEXE ${PROJECT_SOURCE_DIR}/jacobi/bin/jacobi_cuda_aware_mpi)
+  set(CUTEST_JACOBI_CUCORR ${CUTEST_JACOBI_BASEEXE}_cucorr)
+  set(CUTEST_JACOBI_VANILLA ${CUTEST_JACOBI_BASEEXE}_vanilla)
+  set(CUTEST_JACOBI_TSAN_VANILLA ${CUTEST_JACOBI_BASEEXE}_tsan_vanilla)
   set(CUTEST_JACOBI_ARGS "-t 2 1")
 
   get_filename_component(MUST_BIN_DIR "${must_run}" DIRECTORY ABSOLUTE)

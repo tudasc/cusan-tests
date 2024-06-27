@@ -2,8 +2,8 @@
 
 #SBATCH -A project02416
 #SBATCH -J cucorr_jacobi
-#SBATCH -e /work/projects/project02416/jacobi_outputs/%x.err.%j
-#SBATCH -o /work/projects/project02416/jacobi_outputs/%x.err.%j
+#SBATCH -e /work/projects/project02416/jacobi_outputs/%x.out.%j
+#SBATCH -o /work/projects/project02416/jacobi_outputs/%x.out.%j
 # CPU
 #SBATCH -N 2                  # 2 Nodes
 #SBATCH -n 96                 # 1 Task
@@ -13,6 +13,7 @@
 # GPU
 #SBATCH --gres=gpu:v100:1     # 1 GPU NVidia "Volta 100"
 
+module purge
 ml gcc/11 cuda/11.5 openmpi/4.0.7 git python
 ml clang/14
 
@@ -40,31 +41,31 @@ mkdir -p "$bench_base_path"
 nvidia-smi 1>&2
 
 # Without any modifications (vanilla)
-for i in `seq 1 1`;
-  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-%j.txt
-done
+# for i in `seq 1 1`;
+  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p @CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla.txt
+# done
 
 # Vanilla with Tsan
-for i in `seq 1 1`;
-  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-tsan-%j.txt
-done
+# for i in `seq 1 1`;
+  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p @CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-tsan.txt
+# done
 
 # MUST on vanilla (no Tsan)
-for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:printmem -np $num_p .@CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-%j.txt
-done
+# for i in `seq 1 1`;
+  /usr/bin/time -f "Time=%e" mustrun --must:printmem -n $num_p @CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must.txt
+# done
 
 # MUST-Tsan on vanilla
-for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -np $num_p .@CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-tsan-%j.txt
-done
+# for i in `seq 1 1`;
+  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -n $num_p @CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-tsan.txt
+# done
 
 # Cucorr instrumentation
-for i in `seq 1 1`;
-  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-cucorr-%j.txt
-10done!
+# for i in `seq 1 1`;
+  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "Time=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p @CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-cucorr.txt
+# done
 
 # Full: MUST+Cucorr instrumentation
-for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -np $num_p .@CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr-%j.txt
-done
+# for i in `seq 1 1`;
+  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -n $num_p @CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr.txt
+# done

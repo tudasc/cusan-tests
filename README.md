@@ -12,6 +12,14 @@ Test environment for CUDA-aware MPI race detection.
 
 [CMakeLists](CMakeLists.txt) facilitates the execution of our tests by generating appropriate targets.
 
+To setup, execute:
+
+```shell
+$ cd cucorr-tests
+$ mkdir build && cd build
+$ cmake ..
+```
+
 [CMakeLists](CMakeLists.txt) will require the following environment variables:
 - `CUCORR_PATH`: Path to the cucorr installation, to detect the compiler wrappers/libs
 - `MUST_PATH`: PATH to the MUST installation, to detect `mustrun`
