@@ -24,7 +24,7 @@ Test environment for CUDA-aware MPI race detection.
 
 ### testsuite Targets
 
-In root level `build` folder `cmake ..` generates:
+In [root level](./) created `build` folder `cmake ..` generates:
 - Targets to build, and run on the current node, see [CMakeLists](testsuite/CMakeLists.txt): 
     - `make check-cutests`: All
     - `make check-cutests-mpi-to-cuda`: Only MPI to cuda races
@@ -32,7 +32,7 @@ In root level `build` folder `cmake ..` generates:
 
 ### Jacobi Targets
 
-In root level `build` folder `cmake ..` generates:
+In [root level](./) created `build` folder `cmake ..` generates:
 - Targets to build, and run on the current node, see [CMakeLists](jacobi/scripts/CMakeLists.txt): 
     - `make jacobi-all-build`: builds vanilla, vanilla-tsan, cucorr
     - `make jacobi-run` or `make jacobi-vanilla-run`: Run on current node
@@ -40,7 +40,7 @@ In root level `build` folder `cmake ..` generates:
 
 ### TeaLeaf Targets
 
-In root level `build` folder `cmake ..` generates:
+In [root level](./) created `build` folder `cmake ..` generates:
 - Targets to build, and run on the current node, see [CMakeLists](tealeaf/scripts/CMakeLists.txt): 
     - `make tealeaf-all-build`: builds vanilla, vanilla-tsan, cucorr
     - `make tealeaf-run` or `make tealeaf-vanilla-run`: Run on current node
