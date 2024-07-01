@@ -29,7 +29,7 @@ fi
 
 
 CUCORR_WRAPPER=OFF cmake \
-              -DENABLE_MPI=ON -B"${build_dir}" -DMODEL=cuda -DCUDA_ARCH=sm_70 -DCMAKE_BUILD_TYPE=Release -DTHREAD_SANITIZER=$tsan_flag \
+              -DENABLE_MPI=ON -B"${build_dir}" -DMODEL=cuda -DCUDA_ARCH=sm_70 -DCMAKE_CUDA_ARCHITECTURES=70 -DCMAKE_BUILD_TYPE=Release -DTHREAD_SANITIZER=$tsan_flag \
               -DMODEL=cuda -DCMAKE_CUDA_COMPILER=$CUCORR_MPICXX_EXEC -DCMAKE_CXX_COMPILER=$CUCORR_MPICXX_EXEC  -DCMAKE_C_COMPILER=$CUCORR_MPICC_EXEC
 
 cmake --build "${build_dir}" --clean-first -- -j$compile_threads

@@ -33,6 +33,10 @@ macro(setup)
     set(CMAKE_CXX_STANDARD 17)
     enable_language(CUDA)
 
+    if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+        set(CMAKE_CUDA_ARCHITECTURES 70)
+    endif()
+
     # add -forward-unknown-to-host-compiler for compatibility reasons
     # add -std=c++17 manually as older CMake seems to omit this (source gets treated as C otherwise)
     # FIXME cucorr: unsupported by clang's cuda: -use_fast_math -restrict -keep -forward-unknown-to-host-compiler 

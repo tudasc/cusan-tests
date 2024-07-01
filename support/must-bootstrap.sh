@@ -31,6 +31,7 @@ function must_config() {
     cd "$build_f"
     cmake ../ \
         -DCMAKE_INSTALL_PREFIX="$install_f" \
+        -DENABLE_TYPEART=OFF \
         -DCMAKE_BUILD_TYPE=Release
 }
 

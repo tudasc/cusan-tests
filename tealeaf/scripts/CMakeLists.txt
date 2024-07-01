@@ -81,6 +81,7 @@ function (make_sbatch)
   add_custom_target(tealeaf-sbatch
     COMMAND sbatch sbatch.sh
     COMMAND squeue
+    COMMAND date +%T
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tealeaf
   )
 endfunction()

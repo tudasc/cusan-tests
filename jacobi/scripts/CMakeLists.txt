@@ -92,6 +92,7 @@ function (make_sbatch)
   add_custom_target(jacobi-sbatch
     COMMAND sbatch sbatch.sh
     COMMAND squeue
+    COMMAND date +%T
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/jacobi
   )
 endfunction()

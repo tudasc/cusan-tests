@@ -2,7 +2,7 @@
 
 #SBATCH -A project02416
 #SBATCH -J cucorr_tealeaf
-#SBATCH -e /work/projects/project02416/tealeaf_outputs/%x.err.%j
+#SBATCH -e /work/projects/project02416/tealeaf_outputs/%x.out.%j
 #SBATCH -o /work/projects/project02416/tealeaf_outputs/%x.out.%j
 # CPU
 #SBATCH -N 2                  # 2 Nodes
@@ -54,12 +54,12 @@ cd "@CUTEST_TEALEAF_CUCORR_BUILD_BASE@"/..
 
 # MUST on vanilla (no Tsan)
 # for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:printmem -np $num_p @CUTEST_TEALEAF_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must.txt
+  /usr/bin/time -f "Time=%e" mustrun --must:printmem -n $num_p @CUTEST_TEALEAF_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must.txt
 # done
 
 # MUST-Tsan on vanilla
 # for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -np $num_p @CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must-tsan.txt
+  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -n $num_p @CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must-tsan.txt
 # done
 
 # Cucorr instrumentation
@@ -69,5 +69,5 @@ cd "@CUTEST_TEALEAF_CUCORR_BUILD_BASE@"/..
 
 # Full: MUST+Cucorr instrumentation
 # for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -np $num_p @CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-must-cucorr.txt
+  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -n $num_p @CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-must-cucorr.txt
 # done

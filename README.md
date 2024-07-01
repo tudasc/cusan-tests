@@ -24,11 +24,12 @@ $ cmake ..
 - `CUCORR_PATH`: Path to the cucorr installation, to detect the compiler wrappers/libs
 - `MUST_PATH`: PATH to the MUST installation, to detect `mustrun`
 
-#### Software
-- System software: `gcc/11 cuda/11.5 openmpi/4.0.7 git/2.40 python/3.10 clang/14`
+#### Software & GPU
+- System modules: `1) gcc/11.2.0 2) cuda/11.8 3) openmpi/4.1.6 4) git/2.40.0 5) python/3.10.10 6) clang/14.0.6`
 - Cucorr: [bootstrap](support/cucorr-bootstrap.sh)
 - MUST: [bootstrap](support/must-bootstrap.sh)
 - testsuite: llvm-lit, FileCheck
+- GPU: Tesla T4 and Tesla V100 (arch=sm_70)
 
 ### testsuite Targets
 

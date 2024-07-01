@@ -15,7 +15,7 @@ if [ ! -z "$preflag" ]; then
 fi
 
 if [ -z "$preflag" ]; then
-    LD_PRELOAD="@lib_cucorr_interceptor@" mpiexec -np 2 ./${build_dir}_cucorr/cuda-tealeaf 
+    LD_PRELOAD="@lib_cucorr_interceptor@" /usr/bin/time -f "Time=%e" mpiexec -np 2 ./${build_dir}_cucorr/cuda-tealeaf 
 else
-    mpiexec -np 2 ./${build_dir}_vanilla/cuda-tealeaf 
+    /usr/bin/time -f "Time=%e" mpiexec -np 2 ./${build_dir}_vanilla/cuda-tealeaf 
 fi

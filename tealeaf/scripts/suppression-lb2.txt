@@ -27,3 +27,4 @@ called_from_lib:libopen-rte.so.40*
 called_from_lib:ld-linux-x86-64.so*
 called_from_lib:libmlx5-rdma*
 called_from_lib:libnvidia-ml.so.1
+called_from_lib:libpmi2.so
