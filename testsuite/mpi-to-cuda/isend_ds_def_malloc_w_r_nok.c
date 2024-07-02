@@ -5,28 +5,13 @@
 
 // CHECK-DAG: ThreadSanitizer: data race
 // CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
-// CHECK-DAG: [Error]
 
 #include "../support/gpu_mpi.h"
 
 __global__ void kernel_init(int *arr, const int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   if (tid < N) {
-    arr[tid] = -(tid + 1);
-  }
-}
-
-__global__ void kernel(int *arr, const int N) {
-  int tid = threadIdx.x + blockIdx.x * blockDim.x;
-  if (tid < N) {
-#if __CUDA_ARCH__ >= 700
-    for (int i = 0; i < tid; i++) {
-      __nanosleep(100U);
-    }
-#else
-    printf(">>> __CUDA_ARCH__ !\n");
-#endif
-    arr[tid] = (tid + 1);
+    arr[tid] = -1;
   }
 }
 
@@ -55,21 +40,20 @@ int main(int argc, char *argv[]) {
   cudaMalloc(&d_data, size * sizeof(int));
 
   if (world_rank == 0) {
-    kernel_init<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
+    cudaMemset(d_data, 0, size * sizeof(int));
     cudaDeviceSynchronize();
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
 
+  MPI_Request request;
   if (world_rank == 0) {
-    MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
+    MPI_Isend(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD, &request);
+    // requires wait
+    kernel_init<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
+    MPI_Wait(&request, MPI_STATUS_IGNORE);
   } else if (world_rank == 1) {
-    MPI_Request request;
-    // Recv all negative numbers:
     MPI_Irecv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, &request);
-    // FIXME: MPI_Wait here to avoid racy d_data access
-    // Set all numbers to positive value:
-    kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
     MPI_Wait(&request, MPI_STATUS_IGNORE);
   }
 
@@ -78,9 +62,9 @@ int main(int argc, char *argv[]) {
     cudaMemcpy(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost);
     for (int i = 0; i < size; i++) {
       const int buf_v = h_data[i];
-      // Expect: all values should be positive, given the p_1 kernel sets them
-      // to tid.
-      if (buf_v < 1) {
+      // Expect: all values should be 0, given the p_0 sends them (before
+      // kernel call)
+      if (buf_v != 0) {
         printf("[Error] sync\n");
         break;
       }

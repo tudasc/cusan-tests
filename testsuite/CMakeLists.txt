@@ -127,7 +127,7 @@ function(cutests_add_lit_target)
       set(TARGET_NAME check-cutests-${suite})
     endif()
 
-    if(NOT EXISTS ${SUITE_PATH})
+    if(NOT EXISTS ${SUITE_PATH} AND NOT "${suite}" STREQUAL "staging")
       message(WARNING "Could not find suitable lit test target at ${SUITE_PATH}")
       continue()
     endif()
@@ -145,7 +145,7 @@ set(CUTESTS_SUITES
   all
   staging
   cuda-to-mpi
-  mpi-to-cuda
+  mpi-to-cuda  
 )
 
 cutests_add_lit_target(SUITES ${CUTESTS_SUITES})
