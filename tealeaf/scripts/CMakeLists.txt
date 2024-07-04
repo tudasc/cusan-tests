@@ -74,6 +74,7 @@ function (make_sbatch)
   set(CUTEST_TEALEAF_TSAN_VANILLA ${CUTEST_TEALEAF_CUCORR_BUILD_BASE}_tsan_vanilla/cuda-tealeaf)
   set(CUTEST_TEALEAF_ARGS "")
   get_filename_component(MUST_BIN_DIR "${must_run}" DIRECTORY ABSOLUTE)
+  set(CUTEST_MUST_LAYOUT_FILE ${PROJECT_SOURCE_DIR}/support/must-mpi-layout.xml)
 
   configure_tealeaf_cfg(${CMAKE_CURRENT_SOURCE_DIR}/sbatch.sh.in
     ${CMAKE_CURRENT_SOURCE_DIR}/../sbatch.sh

@@ -1,0 +1,51 @@
+<layout-specification>
+  <levels>
+<level order="0" size="2" place-name="mpi_app"><analyses>
+                    <analysis name="CollectUnmapped" group="MUST_CollectUnmapped"/>
+                    <analysis name="DatatypePredefs" group="MUST_Resource"/>
+                    <analysis name="CommPredefs" group="MUST_Resource"/>
+                    <analysis name="FinalizeNotify" group="MUST_Base"/>
+                    <analysis name="DCollectiveInitNotify" group="MUST_DistributedDeadlock"/>
+                    <analysis name="OpSplitter" group="MUST_Deadlock"/>
+                    <analysis name="WcUpdate" group="MUST_Deadlock"/>
+                    <analysis name="IntegerChecks" group="MUST_BasicChecks"/>
+                    <analysis name="BasicIntegrities" group="MUST_BasicChecks"/>
+                    <analysis name="MpiTSanAnnotations" group="MUST_TSan"/>
+                    <analysis name="OperationChecks" group="MUST_BasicChecks"/>
+                    <analysis name="CommChecks" group="MUST_CommChecks"/>
+                    <analysis name="RequestChecks" group="MUST_RequestChecks"/>
+                    <analysis name="BufferChecks" group="MUST_BufferChecks"/>
+                    <analysis name="DatatypeChecks" group="MUST_DatatypeChecks"/>
+                    <!--<analysis name="OverlapChecks" group="MUST_OverlapChecks"/>-->
+                    <analysis name="GroupChecks" group="MUST_GroupChecks"/>
+                    <analysis name="LeakChecks" group="MUST_LeakChecks"/>
+                    <analysis name="MessageFileManager" group="MUST_Base"/>
+                    <analysis name="RequestCondition" group="MUST_RequestCondition"/>
+                    <analysis name="CollectiveCondition" group="MUST_CollectiveCondition"/>
+                    <analysis name="OnlyOnRootCondition" group="MUST_OnlyOnRootCondition"/>
+                    <analysis name="CompletionCondition" group="MUST_CompletionCondition"/>
+</analyses></level>
+<level order="1" size="1" place-name="mpi_place"><analyses>
+<analysis name="BlockingState" group="MUST_Deadlock"/>
+<analysis name="MsgLoggerHtml" group="MUST_Base"/>
+</analyses></level>
+  </levels>
+  <communications>
+    <default>
+      <comm-strategy name="CStratSimpleUp">
+        <settings></settings>
+      </comm-strategy>
+      <comm-protocol name="CProtMpiSplited">
+        <settings></settings>
+      </comm-protocol>
+    </default>
+    <connection top-level="1" bottom-level="0"
+>
+        <comm-strategy name="CStratSimpleUp">
+            <settings></settings>
+          </comm-strategy>
+          <comm-protocol name="CProtMpiSplited">
+            <settings></settings>
+          </comm-protocol
+></connection>
+</communications></layout-specification>

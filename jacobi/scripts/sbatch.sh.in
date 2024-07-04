@@ -33,6 +33,7 @@ export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppressio
 
 export MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket"
 
+must_layout=@CUTEST_MUST_LAYOUT_FILE@
 bench_base_path=/work/projects/project02416/jacobi_outputs
 num_p=2
 
@@ -57,7 +58,7 @@ nvidia-smi 1>&2
 
 # MUST-Tsan on vanilla
 # for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -n $num_p @CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-tsan.txt
+  /usr/bin/time -f "Time=%e" mustrun --must:layout "${must_layout}" --must:tsan --must:printmem -n $num_p @CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-tsan.txt
 # done
 
 # Cucorr instrumentation
@@ -67,5 +68,5 @@ nvidia-smi 1>&2
 
 # Full: MUST+Cucorr instrumentation
 # for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -n $num_p @CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr.txt
+  /usr/bin/time -f "Time=%e" mustrun --must:layout "${must_layout}" --must:tsan --must:printmem -n $num_p @CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr.txt
 # done

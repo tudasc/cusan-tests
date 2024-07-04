@@ -83,6 +83,7 @@ function (make_sbatch)
   set(CUTEST_JACOBI_VANILLA ${CUTEST_JACOBI_BASEEXE}_vanilla)
   set(CUTEST_JACOBI_TSAN_VANILLA ${CUTEST_JACOBI_BASEEXE}_tsan_vanilla)
   set(CUTEST_JACOBI_ARGS "-t 2 1")
+  set(CUTEST_MUST_LAYOUT_FILE ${PROJECT_SOURCE_DIR}/support/must-mpi-layout.xml)
 
   get_filename_component(MUST_BIN_DIR "${must_run}" DIRECTORY ABSOLUTE)
 

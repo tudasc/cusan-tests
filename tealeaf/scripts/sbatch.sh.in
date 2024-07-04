@@ -33,6 +33,7 @@ export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppressio
 
 export MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket"
 
+must_layout=@CUTEST_MUST_LAYOUT_FILE@
 bench_base_path=/work/projects/project02416/tealeaf_outputs
 num_p=2
 
@@ -59,7 +60,7 @@ cd "@CUTEST_TEALEAF_CUCORR_BUILD_BASE@"/..
 
 # MUST-Tsan on vanilla
 # for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -n $num_p @CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must-tsan.txt
+  /usr/bin/time -f "Time=%e" mustrun --must:layout "${must_layout}" --must:tsan --must:printmem -n $num_p @CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must-tsan.txt
 # done
 
 # Cucorr instrumentation
@@ -69,5 +70,5 @@ cd "@CUTEST_TEALEAF_CUCORR_BUILD_BASE@"/..
 
 # Full: MUST+Cucorr instrumentation
 # for i in `seq 1 1`;
-  /usr/bin/time -f "Time=%e" mustrun --must:tsan --must:printmem -n $num_p @CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-must-cucorr.txt
+  /usr/bin/time -f "Time=%e" mustrun --must:layout "${must_layout}" --must:tsan --must:printmem -n $num_p @CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-must-cucorr.txt
 # done
