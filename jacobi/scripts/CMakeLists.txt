@@ -68,6 +68,10 @@ endfunction()
 
 set(CUCORR_YAML_DIR ${PROJECT_SOURCE_DIR}/jacobi)
 set(CUCORR_SUPPRESSION_DIR ${PROJECT_SOURCE_DIR}/jacobi/scripts)
+set(CUTEST_SUPPORT_DIR ${PROJECT_SOURCE_DIR}/support)
+set(CUTEST_MUST_LAYOUT_FILE ${PROJECT_SOURCE_DIR}/support/must-mpi-layout-2.xml)
+get_filename_component(MUST_BIN_DIR "${must_run}" DIRECTORY ABSOLUTE)
+set(CUTEST_JACOBI_ARGS "-t 2 1 -d 2048")
 
 configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/build.sh.in
   ${CMAKE_CURRENT_SOURCE_DIR}/../build.sh
@@ -82,10 +86,6 @@ function (make_sbatch)
   set(CUTEST_JACOBI_CUCORR ${CUTEST_JACOBI_BASEEXE}_cucorr)
   set(CUTEST_JACOBI_VANILLA ${CUTEST_JACOBI_BASEEXE}_vanilla)
   set(CUTEST_JACOBI_TSAN_VANILLA ${CUTEST_JACOBI_BASEEXE}_tsan_vanilla)
-  set(CUTEST_JACOBI_ARGS "-t 2 1")
-  set(CUTEST_MUST_LAYOUT_FILE ${PROJECT_SOURCE_DIR}/support/must-mpi-layout.xml)
-
-  get_filename_component(MUST_BIN_DIR "${must_run}" DIRECTORY ABSOLUTE)
 
   configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/sbatch.sh.in
     ${CMAKE_CURRENT_SOURCE_DIR}/../sbatch.sh

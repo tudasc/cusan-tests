@@ -26,3 +26,23 @@ add_custom_target(cucorr-bootstrap
     COMMAND "./cucorr-bootstrap.sh" ${MUST_BASE_PATH}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+function(configure_must_cfg input output)
+  file(READ ${input} contents)
+  string(CONFIGURE "${contents}" contents @ONLY)
+  file(GENERATE
+    OUTPUT
+      ${output}
+    CONTENT
+      "${contents}"
+    FILE_PERMISSIONS
+      OWNER_READ OWNER_WRITE OWNER_EXECUTE
+      GROUP_READ
+      WORLD_READ
+  )
+endfunction()
+
+set(MUST_LAYOUT_PROCESS_COUNT 2)
+configure_must_cfg(${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout.xml.in ${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout-2.xml)
+set(MUST_LAYOUT_PROCESS_COUNT 4)
+configure_must_cfg(${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout.xml.in ${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout-4.xml)

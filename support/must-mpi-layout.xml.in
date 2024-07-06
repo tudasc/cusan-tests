@@ -1,6 +1,6 @@
 <layout-specification>
   <levels>
-<level order="0" size="2" place-name="mpi_app"><analyses>
+<level order="0" size="@MUST_LAYOUT_PROCESS_COUNT@" place-name="mpi_app"><analyses>
                     <analysis name="CollectUnmapped" group="MUST_CollectUnmapped"/>
                     <analysis name="DatatypePredefs" group="MUST_Resource"/>
                     <analysis name="CommPredefs" group="MUST_Resource"/>

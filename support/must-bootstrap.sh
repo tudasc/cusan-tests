@@ -7,6 +7,8 @@ ml clang/14
 export CC=clang
 export CXX=clang++
 
+script_dir=$(pwd)
+
 if [ -z "$1" ]; then
     base_must_f=$(pwd)
 else
@@ -26,6 +28,11 @@ function must_fetch() {
     git submodule update --recursive --init
 }
 
+functioned must_patch() {
+    cd "$base_must_f"/must-tsan
+    git apply "${script_dir}"/must-changes.patch
+}
+
 function must_config() {
     mkdir -p "$build_f"
     cd "$build_f"
@@ -41,6 +48,7 @@ function must_install() {
 }
 
 must_fetch
+must_patch
 must_config
 must_install
 

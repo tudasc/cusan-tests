@@ -5,10 +5,19 @@ export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-jacobi.yaml"
 
 export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppression-lb2.txt"
 
+export PATH="@MUST_BIN_DIR@":$PATH
+
+must_layout=@CUTEST_MUST_LAYOUT_FILE@
 
 preflag=$1
+if [ "$preflag" = "must-tsan" ]; then
+  echo "preflag matches the string 'must'"
+  /usr/bin/time -f "Time=%e" mustrun --must:layout "${must_layout}" --must:printmem ./bin/jacobi_cuda_aware_mpi_tsan_vanilla @CUTEST_JACOBI_ARGS@ 
+  exit 0
+fi
+
 if [ -z "$preflag" ]; then
-    LD_PRELOAD="@lib_cucorr_interceptor@" /usr/bin/time -f "Time=%e" mpiexec -np 2 ./bin/jacobi_cuda_aware_mpi_cucorr -t 2 1
+    LD_PRELOAD="@lib_cucorr_interceptor@" /usr/bin/time -f "Time=%e" mpiexec -np 2 ./bin/jacobi_cuda_aware_mpi_cucorr @CUTEST_JACOBI_ARGS@ 
 else
-    /usr/bin/time -f "Time=%e" mpiexec -np 2 ./bin/jacobi_cuda_aware_mpi_tsan_vanilla -t 2 1
+    /usr/bin/time -f "Time=%e" mpiexec -np 2 ./bin/jacobi_cuda_aware_mpi_tsan_vanilla @CUTEST_JACOBI_ARGS@ 
 fi

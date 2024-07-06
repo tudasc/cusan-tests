@@ -1,0 +1,289 @@
+diff --git a/modules/MpiTSanAnnotations/MpiTSanAnnotations.cpp b/modules/MpiTSanAnnotations/MpiTSanAnnotations.cpp
+index 7c0ebaaf..b139d870 100644
+--- a/modules/MpiTSanAnnotations/MpiTSanAnnotations.cpp
++++ b/modules/MpiTSanAnnotations/MpiTSanAnnotations.cpp
+@@ -24,8 +24,8 @@ mPNMPI_REGISTRATIONPOINT_FUNCTION(MpiTSanAnnotations)
+ // Constructor
+ //=============================
+ MpiTSanAnnotations::MpiTSanAnnotations(const char* instanceName)
+-    : gti::ModuleBase<MpiTSanAnnotations, I_MpiTSanAnnotations, true>(instanceName), requestBlocklist(),
+-      preparedBlocklists(), requestLocation()
++    : gti::ModuleBase<MpiTSanAnnotations, I_MpiTSanAnnotations, true>(instanceName),
++      requestBlocklist(), preparedBlocklists(), requestLocation()
+ {
+     // create sub modules
+     std::vector<I_Module*> subModInstances;
+@@ -132,7 +132,7 @@ void MpiTSanAnnotations::annotateFromMemIntervalList(
+     const MustMemIntervalListType& iList,
+     void* fp = nullptr)
+ {
+-    assert(iList.size()==1);
++    assert(iList.size() == 1);
+     void* pc;
+     PNMPI_Service_GetReturnAddress(&pc);
+     if (!fp) {
+@@ -149,7 +149,8 @@ void MpiTSanAnnotations::annotateFromMemIntervalList(
+                   << std::endl;
+ #endif
+         if (stridedBlock.isSend) {
+-            if(!reqIsSend){ printf("annotateFromMemIntervalList: %i, size = %lu\n", reqIsSend, iList.size()); }
++            // if(!reqIsSend){ printf("annotateFromMemIntervalList: %i, size = %lu\n", reqIsSend,
++            // iList.size()); }
+             assert(reqIsSend);
+             if (stridedBlock.stride == 0) {
+                 myTSanMod->annotateMemoryReadPC(
+@@ -170,7 +171,8 @@ void MpiTSanAnnotations::annotateFromMemIntervalList(
+                 }
+             }
+         } else {
+-            if(reqIsSend){ printf("annotateFromMemIntervalList: %i, size = %lu\n", reqIsSend, iList.size()); }
++            // if(reqIsSend){ printf("annotateFromMemIntervalList: %i, size = %lu\n", reqIsSend,
++            // iList.size()); }
+             assert(!reqIsSend);
+             if (stridedBlock.stride == 0) {
+                 myTSanMod->annotateMemoryWritePC(
+@@ -239,14 +241,15 @@ GTI_ANALYSIS_RETURN MpiTSanAnnotations::makeBlocksActive(
+     }
+     {
+         auto x_safe_requestBlocklist = xlock_safe_ptr(requestBlocklist);
+-/*        auto list = (*x_safe_requestBlocklist)[rank].find(request);
+-        if (list == (*x_safe_requestBlocklist)[rank].end())
+-            (*x_safe_requestBlocklist)[rank][request] = preparedList;
+-        else {
+-            printf("Found request (%li, %li) in requestBlocklist when it should not be there\n", pId&0xffffff, request);
+-            assert(false && "Found request in requestBlocklist when it should not be there");
+-            //list->second.insert(preparedList.begin(), preparedList.end());
+-        }*/
++        /*        auto list = (*x_safe_requestBlocklist)[rank].find(request);
++                if (list == (*x_safe_requestBlocklist)[rank].end())
++                    (*x_safe_requestBlocklist)[rank][request] = preparedList;
++                else {
++                    printf("Found request (%li, %li) in requestBlocklist when it should not be
++           there\n", pId&0xffffff, request); assert(false && "Found request in requestBlocklist when
++           it should not be there");
++                    //list->second.insert(preparedList.begin(), preparedList.end());
++                }*/
+         (*x_safe_requestBlocklist)[rank][request] = preparedList;
+     }
+ 
+@@ -260,22 +263,26 @@ GTI_ANALYSIS_RETURN MpiTSanAnnotations::makeBlocksActive(
+         myTSanMod->annotateHappensBefore(pId, lId, newFiber);
+     }
+ #else
+-/*    myTSanMod->annotateIgnoreSyncBegin();
+-    annotateFromMemIntervalList(pId, lId, preparedList, fp);
+-    myTSanMod->annotateIgnoreSyncEnd();*/
++    /*    myTSanMod->annotateIgnoreSyncBegin();
++        annotateFromMemIntervalList(pId, lId, preparedList, fp);
++        myTSanMod->annotateIgnoreSyncEnd();*/
+     myTSanMod->annotateHappensBefore(pId, lId, rInfo);
+ #endif
+ #ifndef NDEBUG
+     bool isSend = preparedList.begin()->isSend;
+-    for (const auto& i: preparedList)
++    for (const auto& i : preparedList)
+         assert(i.isSend == isSend);
+ #endif
+ 
+     return GTI_ANALYSIS_SUCCESS;
+ }
+ 
+-template<class T>
+-std::pair<const T&,bool> getRequestRankElement(sf::contfree_safe_ptr<mustPidRequestMap<T>>& map, int rank, MustRequestType req){
++template <class T>
++std::pair<const T&, bool> getRequestRankElement(
++    sf::contfree_safe_ptr<mustPidRequestMap<T>>& map,
++    int rank,
++    MustRequestType req)
++{
+     static T nullObj{};
+     auto ret = std::make_pair(nullObj, false);
+     auto smap = slock_safe_ptr(map);
+@@ -292,21 +299,21 @@ GTI_ANALYSIS_RETURN
+ MpiTSanAnnotations::makeBlocksInActive(MustParallelId pId, MustRequestType request)
+ {
+     int rank = myPIdMod->getInfoForId(pId).rank;
+-    auto infoRes = getRequestRankElement(requestLocation,rank,request);
+-    if(!infoRes.second) 
++    auto infoRes = getRequestRankElement(requestLocation, rank, request);
++    if (!infoRes.second)
+         return GTI_ANALYSIS_SUCCESS;
+     const auto& info = infoRes.first;
+ 
+     I_Request* rInfo = myReqMod->getRequest(pId, request);
+ #ifdef USE_FIBERS
+     void* curFiber = myTSanMod->getCurrentFiber();
+-    //int stackSize = myTSanMod->getStacksize(curFiber);
+-    //assert(stackSize>0);
++    // int stackSize = myTSanMod->getStacksize(curFiber);
++    // assert(stackSize>0);
+ 
+     auto x_safe_fiberList = xlock_safe_ptr(fiberList);
+     void* rFiber = (*x_safe_fiberList)[rank][request];
+ 
+-    if(rFiber)
++    if (rFiber)
+         myTSanMod->switchToFiber(rFiber, 1);
+     myTSanMod->annotateHappensAfter(pId, info.lId, rFiber);
+ #else
+@@ -316,24 +323,29 @@ MpiTSanAnnotations::makeBlocksInActive(MustParallelId pId, MustRequestType reque
+     // ignore any synchronization implied while annotating mem access (otherwise we might run
+     // into false negatives due to usage of safeptr etc.)
+     myTSanMod->annotateIgnoreSyncBegin();
+-    //assert(bl.size()==1);
+-//    annotateFromMemIntervalList(info.pId, info.lId, bl, info.fp);
++    // assert(bl.size()==1);
++    //    annotateFromMemIntervalList(info.pId, info.lId, bl, info.fp);
+     auto x_safe_requestBlocklist = xlock_safe_ptr(requestBlocklist);
+-//    printf("makeBlocksInActive(%li, %li)\n", pId&0xffffff, request);
+-    assert((*x_safe_requestBlocklist)[rank].find(request) != (*x_safe_requestBlocklist)[rank].end());
+-    annotateFromMemIntervalList(info.pId, info.lId, (*x_safe_requestBlocklist)[rank][request], info.fp);
++    //    printf("makeBlocksInActive(%li, %li)\n", pId&0xffffff, request);
++    assert(
++        (*x_safe_requestBlocklist)[rank].find(request) != (*x_safe_requestBlocklist)[rank].end());
++    annotateFromMemIntervalList(
++        info.pId,
++        info.lId,
++        (*x_safe_requestBlocklist)[rank][request],
++        info.fp);
+     myTSanMod->annotateIgnoreSyncEnd();
+ 
+ #ifdef USE_FIBERS
+     // switch to current thread *with* synchronization
+     // (memory accesses afterwards do *not* conflict with *this* annotated call)
+-    if(rFiber)
++    if (rFiber)
+         myTSanMod->switchToFiber(curFiber, 0);
+-//    assert(curFiber == myTSanMod->getCurrentFiber());
+-//    int stackSize2 = myTSanMod->getStacksize(curFiber);
+-//    assert(stackSize == stackSize2);
+-//    assert(stackSize2 > 0);
+-//    myTSanMod->destroyFiber(rInfo->getFiber());
++    //    assert(curFiber == myTSanMod->getCurrentFiber());
++    //    int stackSize2 = myTSanMod->getStacksize(curFiber);
++    //    assert(stackSize == stackSize2);
++    //    assert(stackSize2 > 0);
++    //    myTSanMod->destroyFiber(rInfo->getFiber());
+     myTSanMod->destroyFiber(rFiber);
+     (*x_safe_fiberList)[rank].erase(request);
+ #endif
+@@ -341,10 +353,12 @@ MpiTSanAnnotations::makeBlocksInActive(MustParallelId pId, MustRequestType reque
+     // after deleting the blocks from activeBlocks, delete the list of bookmarks
+     auto x_safe_requestLocation = xlock_safe_ptr(requestLocation);
+     (*x_safe_requestLocation)[rank].erase(request);
+-//    (*xlock_safe_ptr(requestBlocklist))[rank].erase(request);
+-    assert((*x_safe_requestBlocklist)[rank].find(request) != (*x_safe_requestBlocklist)[rank].end());
++    //    (*xlock_safe_ptr(requestBlocklist))[rank].erase(request);
++    assert(
++        (*x_safe_requestBlocklist)[rank].find(request) != (*x_safe_requestBlocklist)[rank].end());
+     (*x_safe_requestBlocklist)[rank].erase(request);
+-    assert((*x_safe_requestBlocklist)[rank].find(request) == (*x_safe_requestBlocklist)[rank].end());
++    assert(
++        (*x_safe_requestBlocklist)[rank].find(request) == (*x_safe_requestBlocklist)[rank].end());
+     return GTI_ANALYSIS_SUCCESS;
+ }
+ 
+@@ -355,9 +369,11 @@ GTI_ANALYSIS_RETURN MpiTSanAnnotations::freeRequestBlocks(int rank, MustRequestT
+     (*x_safe_requestLocation)[rank].erase(request);
+ 
+     auto x_safe_requestBlocklist = xlock_safe_ptr(requestBlocklist);
+-    assert((*x_safe_requestBlocklist)[rank].find(request) != (*x_safe_requestBlocklist)[rank].end());
++    assert(
++        (*x_safe_requestBlocklist)[rank].find(request) != (*x_safe_requestBlocklist)[rank].end());
+     (*x_safe_requestBlocklist)[rank].erase(request);
+-    assert((*x_safe_requestBlocklist)[rank].find(request) == (*x_safe_requestBlocklist)[rank].end());
++    assert(
++        (*x_safe_requestBlocklist)[rank].find(request) == (*x_safe_requestBlocklist)[rank].end());
+ 
+ #ifdef USE_FIBERS
+     auto x_safe_fiberList = xlock_safe_ptr(fiberList);
+@@ -836,7 +852,8 @@ GTI_ANALYSIS_RETURN MpiTSanAnnotations::announcePSendRequest(
+     }
+     {
+         auto x_safe_preparedBlocklists = xlock_safe_ptr(preparedBlocklists);
+-        (*x_safe_preparedBlocklists)[myPIdMod->getInfoForId(pId).rank][request] = calcIntervalList(typeinfo, buffer, count, request, true);
++        (*x_safe_preparedBlocklists)[myPIdMod->getInfoForId(pId).rank][request] =
++            calcIntervalList(typeinfo, buffer, count, request, true);
+     }
+     return GTI_ANALYSIS_SUCCESS;
+ }
+@@ -863,9 +880,9 @@ GTI_ANALYSIS_RETURN MpiTSanAnnotations::announceSendRequest(
+         return GTI_ANALYSIS_SUCCESS;
+     }
+     MustMemIntervalListType iList = calcIntervalList(typeinfo, buffer, count, request, true);
+-    for (const auto& i: iList)
++    for (const auto& i : iList)
+         assert(i.isSend);
+-    assert(iList.size()==1);
++    assert(iList.size() == 1);
+     makeBlocksActive(pId, lId, iList, request);
+ 
+     return GTI_ANALYSIS_SUCCESS;
+@@ -896,9 +913,11 @@ GTI_ANALYSIS_RETURN MpiTSanAnnotations::announcePRecvRequest(
+     int rank = myPIdMod->getInfoForId(pId).rank;
+     {
+         auto x_safe_preparedBlocklists = xlock_safe_ptr(preparedBlocklists);
+-        (*x_safe_preparedBlocklists)[rank][request] = calcIntervalList(typeinfo, buffer, count, request, true);
++        (*x_safe_preparedBlocklists)[rank][request] =
++            calcIntervalList(typeinfo, buffer, count, request, true);
+     }
+-//    (*xlock_safe_ptr(preparedBlocklists))[pId][request] = calcIntervalList(typeinfo, buffer, count, request, false);
++    //    (*xlock_safe_ptr(preparedBlocklists))[pId][request] = calcIntervalList(typeinfo, buffer,
++    //    count, request, false);
+     return GTI_ANALYSIS_SUCCESS;
+ }
+ 
+@@ -941,9 +960,9 @@ GTI_ANALYSIS_RETURN MpiTSanAnnotations::announceRecvRequest(
+         return GTI_ANALYSIS_SUCCESS;
+     }
+     MustMemIntervalListType iList = calcIntervalList(typeinfo, buffer, count, request, false);
+-    for (const auto& i: iList)
++    for (const auto& i : iList)
+         assert(!i.isSend);
+-    assert(iList.size()==1);
++    assert(iList.size() == 1);
+     makeBlocksActive(pId, lId, iList, request);
+ 
+     return GTI_ANALYSIS_SUCCESS;
+@@ -967,8 +986,9 @@ MpiTSanAnnotations::startPRequest(MustParallelId pId, MustLocationId lId, MustRe
+     if (reqMapPos == pIdMapPos->second.end()) {
+         return GTI_ANALYSIS_SUCCESS;
+     }*/
+-    auto pblRes = getRequestRankElement(preparedBlocklists,myPIdMod->getInfoForId(pId).rank,request);
+-    if(!pblRes.second) 
++    auto pblRes =
++        getRequestRankElement(preparedBlocklists, myPIdMod->getInfoForId(pId).rank, request);
++    if (!pblRes.second)
+         return GTI_ANALYSIS_SUCCESS;
+     const auto& pbl = pblRes.first;
+ 
+@@ -1059,5 +1079,5 @@ MustMemIntervalListType MpiTSanAnnotations::calcIntervalList(
+             buffer);
+     }
+ 
+-//    return ret;
++    //    return ret;
+ }
+\ No newline at end of file
+diff --git a/utility/mustrun2.sh b/utility/mustrun2.sh
+index 78870a2d..910e0778 100644
+--- a/utility/mustrun2.sh
++++ b/utility/mustrun2.sh
+@@ -734,7 +734,7 @@ End-of-File
+ 
+                 if cmaketrue "@ENABLE_TSAN@" && [ $do_tsan -ne 0 ]
+                 then
+-                    echo >> $printLayoutFile "                    <analysis name=\"TSanMessages\" group=\"MUST_TSanMessages\"/>"
++                    # echo >> $printLayoutFile "                    <analysis name=\"TSanMessages\" group=\"MUST_TSanMessages\"/>"
+                     echo >> $printLayoutFile "                    <analysis name=\"MpiTSanAnnotations\" group=\"MUST_TSan\"/>"
+                 fi
+ 
+@@ -2434,7 +2434,7 @@ export PNMPI_CONF=$temp_arg/pnmpi.conf
+ must_exports="${must_exports} PNMPI_CONF"
+ if cmaketrue "@ENABLE_TSAN@" && [ $do_tsan -ne 0 ]
+ then
+-    export LD_PRELOAD=@CMAKE_INSTALL_PREFIX@/modules/libTSanMessages.so:$LD_PRELOAD
++    # export LD_PRELOAD=@CMAKE_INSTALL_PREFIX@/modules/libTSanMessages.so:$LD_PRELOAD
+     must_exports="${must_exports} LD_PRELOAD"
+ fi
+ 

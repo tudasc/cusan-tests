@@ -59,6 +59,10 @@ endfunction()
 set(CUCORR_YAML_DIR ${PROJECT_SOURCE_DIR}/tealeaf)
 set(CUCORR_SUPPRESSION_DIR ${PROJECT_SOURCE_DIR}/tealeaf/scripts)
 
+set(CUTEST_SUPPORT_DIR ${PROJECT_SOURCE_DIR}/support)
+get_filename_component(MUST_BIN_DIR "${must_run}" DIRECTORY ABSOLUTE)
+set(CUTEST_MUST_LAYOUT_FILE ${PROJECT_SOURCE_DIR}/support/must-mpi-layout-2.xml)
+
 configure_tealeaf_cfg(${CMAKE_CURRENT_SOURCE_DIR}/build.sh.in
   ${CMAKE_CURRENT_SOURCE_DIR}/../build.sh
   )
@@ -73,8 +77,6 @@ function (make_sbatch)
   set(CUTEST_TEALEAF_VANILLA ${CUTEST_TEALEAF_CUCORR_BUILD_BASE}_vanilla/cuda-tealeaf)
   set(CUTEST_TEALEAF_TSAN_VANILLA ${CUTEST_TEALEAF_CUCORR_BUILD_BASE}_tsan_vanilla/cuda-tealeaf)
   set(CUTEST_TEALEAF_ARGS "")
-  get_filename_component(MUST_BIN_DIR "${must_run}" DIRECTORY ABSOLUTE)
-  set(CUTEST_MUST_LAYOUT_FILE ${PROJECT_SOURCE_DIR}/support/must-mpi-layout.xml)
 
   configure_tealeaf_cfg(${CMAKE_CURRENT_SOURCE_DIR}/sbatch.sh.in
     ${CMAKE_CURRENT_SOURCE_DIR}/../sbatch.sh
