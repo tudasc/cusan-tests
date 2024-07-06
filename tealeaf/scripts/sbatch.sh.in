@@ -41,7 +41,7 @@ b_reps=3
 
 mkdir -p "$bench_base_path"
 
-"@CUTEST_SUPPORT_DIR@"/make_info.sh
+"@CUTEST_SUPPORT_DIR@"/make_info.sh "${must_layout}"
 
 cd "@CUTEST_TEALEAF_CUCORR_BUILD_BASE@"/..
 

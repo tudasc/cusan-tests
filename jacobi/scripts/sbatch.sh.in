@@ -5,7 +5,7 @@
 #SBATCH -e /work/projects/project02416/jacobi-%j/%x.out
 #SBATCH -o /work/projects/project02416/jacobi-%j/%x.out
 # CPU
-#SBATCH -N 2                  # 2 Nodes
+#SBATCH -N @CUTEST_NP@                  # 2 Nodes
 #SBATCH -n 96                 # 1 Task
 #SBATCH -c 1                  # 1 CPU/Task
 #SBATCH --mem-per-cpu=1750    
@@ -36,13 +36,13 @@ export MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket"
 
 must_layout=@CUTEST_MUST_LAYOUT_FILE@
 bench_base_path=/work/projects/project02416/jacobi-$SLURM_JOB_ID
-num_p=2
+num_p=@CUTEST_NP@
 
 b_reps=3
 
 mkdir -p "$bench_base_path"
 
-"@CUTEST_SUPPORT_DIR@"/make_info.sh
+"@CUTEST_SUPPORT_DIR@"/make_info.sh "${must_layout}"
 
 # Without any modifications (vanilla)
 for i in `seq 1 $b_reps`; do

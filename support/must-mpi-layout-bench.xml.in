@@ -1,0 +1,27 @@
+<layout-specification>
+  <levels>
+<level order="0" size="4" place-name="mpi_app"><analyses>
+                    <analysis name="MpiTSanAnnotations" group="MUST_TSan"/>
+</analyses></level>
+<level order="1" size="1" place-name="mpi_place"><analyses>
+<analysis name="MsgLoggerHtml" group="MUST_Base"/>
+</analyses></level>
+  </levels>
+  <communications>
+    <default>
+      <comm-strategy name="CStratSimpleUp">
+        <settings></settings>
+      </comm-strategy>
+      <comm-protocol name="CProtMpiSplited">
+        <settings></settings>
+      </comm-protocol>
+    </default>
+    <connection top-level="1" bottom-level="0">
+        <comm-strategy name="CStratSimpleUp">
+            <settings></settings>
+          </comm-strategy>
+          <comm-protocol name="CProtMpiSplited">
+            <settings></settings>
+          </comm-protocol
+></connection>
+</communications></layout-specification>

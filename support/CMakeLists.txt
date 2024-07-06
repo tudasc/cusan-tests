@@ -43,6 +43,6 @@ function(configure_must_cfg input output)
 endfunction()
 
 set(MUST_LAYOUT_PROCESS_COUNT 2)
-configure_must_cfg(${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout.xml.in ${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout-2.xml)
+configure_must_cfg(${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout-bench.xml.in ${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout-2.xml)
 set(MUST_LAYOUT_PROCESS_COUNT 4)
-configure_must_cfg(${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout.xml.in ${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout-4.xml)
+configure_must_cfg(${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout-bench.xml.in ${CMAKE_CURRENT_SOURCE_DIR}/must-mpi-layout-4.xml)

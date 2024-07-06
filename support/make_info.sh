@@ -25,4 +25,10 @@ echo "(load-average \"${lav}\")"
 echo "(hostname \"${hostname}\")"
 echo ")"
 
+if [ ! -z "$1" ]; then
+    echo "MUST layout file >>>"
+    cat "$1"
+    echo "<<< MUST layout file"
+fi
+
 nvidia-smi

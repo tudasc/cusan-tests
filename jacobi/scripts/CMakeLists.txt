@@ -66,12 +66,13 @@ function(add_build_clean_target name dir)
 endfunction()
 
 
+set(CUTEST_NP 2)
 set(CUCORR_YAML_DIR ${PROJECT_SOURCE_DIR}/jacobi)
 set(CUCORR_SUPPRESSION_DIR ${PROJECT_SOURCE_DIR}/jacobi/scripts)
 set(CUTEST_SUPPORT_DIR ${PROJECT_SOURCE_DIR}/support)
-set(CUTEST_MUST_LAYOUT_FILE ${PROJECT_SOURCE_DIR}/support/must-mpi-layout-2.xml)
+set(CUTEST_MUST_LAYOUT_FILE ${PROJECT_SOURCE_DIR}/support/must-mpi-layout-${CUTEST_NP}.xml)
 get_filename_component(MUST_BIN_DIR "${must_run}" DIRECTORY ABSOLUTE)
-set(CUTEST_JACOBI_ARGS "-t 2 1 -d 2048")
+set(CUTEST_JACOBI_ARGS "-t ${CUTEST_NP} 1 -d 2048")
 
 configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/build.sh.in
   ${CMAKE_CURRENT_SOURCE_DIR}/../build.sh
@@ -81,24 +82,27 @@ configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/run.sh.in
   ${CMAKE_CURRENT_SOURCE_DIR}/../run.sh
   )
 
-function (make_sbatch)
+function (make_sbatch target file_in file_out)
   set(CUTEST_JACOBI_BASEEXE ${PROJECT_SOURCE_DIR}/jacobi/bin/jacobi_cuda_aware_mpi)
   set(CUTEST_JACOBI_CUCORR ${CUTEST_JACOBI_BASEEXE}_cucorr)
   set(CUTEST_JACOBI_VANILLA ${CUTEST_JACOBI_BASEEXE}_vanilla)
   set(CUTEST_JACOBI_TSAN_VANILLA ${CUTEST_JACOBI_BASEEXE}_tsan_vanilla)
 
-  configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/sbatch.sh.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sbatch.sh
+  configure_jacobi_cfg(${file_in}
+    ${file_out}
     )
-  add_custom_target(jacobi-sbatch
-    COMMAND sbatch sbatch.sh
+  add_custom_target(jacobi-${target}
+    COMMAND sbatch ${file_out}
     COMMAND squeue
     COMMAND date +%T
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/jacobi
   )
 endfunction()
 
-make_sbatch()
+make_sbatch(sbatch ${CMAKE_CURRENT_SOURCE_DIR}/sbatch.sh.in ${CMAKE_CURRENT_SOURCE_DIR}/../sbatch.sh)
+
+set(CUTEST_JACOBI_ARGS "-t ${CUTEST_NP} 1 -d $d")
+make_sbatch(scale ${CMAKE_CURRENT_SOURCE_DIR}/sbatch-scale.sh.in ${CMAKE_CURRENT_SOURCE_DIR}/../sbatch-scale.sh)
 
 add_build_clean_target(jacobi
     ${PROJECT_SOURCE_DIR}/jacobi
