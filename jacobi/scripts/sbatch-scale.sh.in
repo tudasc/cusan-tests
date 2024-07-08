@@ -38,7 +38,7 @@ must_layout=@CUTEST_MUST_LAYOUT_FILE@
 bench_base_path=/work/projects/project02416/jacobi-scale-$SLURM_JOB_ID
 num_p=@CUTEST_NP@
 
-b_reps=1
+b_reps=5
 
 mkdir -p "$bench_base_path"
 

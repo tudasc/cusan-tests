@@ -55,6 +55,7 @@ function(add_build_clean_target name dir)
     )
 endfunction()
 
+set(CUTEST_NP 2)
 
 set(CUCORR_YAML_DIR ${PROJECT_SOURCE_DIR}/tealeaf)
 set(CUCORR_SUPPRESSION_DIR ${PROJECT_SOURCE_DIR}/tealeaf/scripts)
@@ -72,10 +73,10 @@ configure_tealeaf_cfg(${CMAKE_CURRENT_SOURCE_DIR}/run.sh.in
   )
 
 function (make_sbatch)
-  set(CUTEST_TEALEAF_CUCORR_BUILD_BASE ${PROJECT_SOURCE_DIR}/tealeaf/build)
-  set(CUTEST_TEALEAF_CUCORR ${CUTEST_TEALEAF_CUCORR_BUILD_BASE}_cucorr/cuda-tealeaf)
-  set(CUTEST_TEALEAF_VANILLA ${CUTEST_TEALEAF_CUCORR_BUILD_BASE}_vanilla/cuda-tealeaf)
-  set(CUTEST_TEALEAF_TSAN_VANILLA ${CUTEST_TEALEAF_CUCORR_BUILD_BASE}_tsan_vanilla/cuda-tealeaf)
+  set(CUTEST_TEALEAF_CUCORR_BUILD_BASE ${PROJECT_SOURCE_DIR}/tealeaf)
+  set(CUTEST_TEALEAF_CUCORR ${CUTEST_TEALEAF_CUCORR_BUILD_BASE}/build_cucorr/cuda-tealeaf)
+  set(CUTEST_TEALEAF_VANILLA ${CUTEST_TEALEAF_CUCORR_BUILD_BASE}/build_vanilla/cuda-tealeaf)
+  set(CUTEST_TEALEAF_TSAN_VANILLA ${CUTEST_TEALEAF_CUCORR_BUILD_BASE}/build_tsan_vanilla/cuda-tealeaf)
   set(CUTEST_TEALEAF_ARGS "")
 
   configure_tealeaf_cfg(${CMAKE_CURRENT_SOURCE_DIR}/sbatch.sh.in

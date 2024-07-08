@@ -1,6 +1,6 @@
 <layout-specification>
   <levels>
-<level order="0" size="4" place-name="mpi_app"><analyses>
+<level order="0" size="@MUST_LAYOUT_PROCESS_COUNT@" place-name="mpi_app"><analyses>
                     <analysis name="MpiTSanAnnotations" group="MUST_TSan"/>
 </analyses></level>
 <level order="1" size="1" place-name="mpi_place"><analyses>

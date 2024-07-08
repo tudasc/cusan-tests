@@ -27,9 +27,14 @@ function cucorr_fetch() {
 function cucorr_config() {
     mkdir -p "$build_f"
     cd "$build_f"
-    cmake ../ \
+    cmake .. \
         -DCMAKE_INSTALL_PREFIX="$install_f" \
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCUCORR_FIBERPOOL=ON \
+        -DCUCORR_SOFTCOUNTER=OFF \
+        -DCUCORR_SYNC_DETAIL_LEVEL=ON \
+        -DTYPEART_SOFTCOUNTERS=OFF \
+        -DTYPEART_SHOW_STATS=OFF
 }
 
 function cucorr_install() {
