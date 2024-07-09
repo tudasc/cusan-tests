@@ -54,14 +54,9 @@ for i in `seq 1 $b_reps`; do
   LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "MTime=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p @CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-tsan.txt
 done
 
-# MUST on vanilla (no Tsan)
-for i in `seq 1 $b_reps`; do
-  /usr/bin/time -f "MTime=%e" mustrun --must:printmem -n $num_p @CUTEST_JACOBI_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must.txt
-done
-
 # MUST-Tsan on vanilla
 for i in `seq 1 $b_reps`; do
-  /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:printmem @CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-tsan.txt
+  /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:stacktrace none --must:printmem @CUTEST_JACOBI_TSAN_VANILLA@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-vanilla-must-tsan.txt
 done
 
 # Cucorr instrumentation
@@ -71,7 +66,7 @@ done
 
 # Full: MUST+Cucorr instrumentation
 for i in `seq 1 $b_reps`; do
-  /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:printmem @CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr.txt
+  /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:stacktrace none --must:printmem @CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr.txt
 done
 
 "@CUTEST_SUPPORT_DIR@"/make_info.sh fin

@@ -66,4 +66,11 @@ for d in 256 512 1024 2048 4096; do
   done
 done
 
+# Cucorr instrumentation
+for d in 256 512 1024 2048 4096; do
+  for i in `seq 1 $b_reps`; do
+    /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:printmem @CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr-$d.txt
+  done
+done
+
 "@CUTEST_SUPPORT_DIR@"/make_info.sh fin

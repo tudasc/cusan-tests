@@ -9,7 +9,7 @@
 #SBATCH -n 96                 # 1 Task
 #SBATCH -c 1                  # 1 CPU/Task
 #SBATCH --mem-per-cpu=1750    
-#SBATCH -t 02:00:00           
+#SBATCH -t 00:40:00           
 # GPU
 #SBATCH --gres=gpu:v100:1     # 1 GPU NVidia "Volta 100"
 
@@ -55,14 +55,9 @@ for i in `seq 1 $b_reps`; do
   LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "MTime=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p @CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-tsan.txt
 done
 
-# MUST on vanilla (no Tsan)
-for i in `seq 1 $b_reps`; do
-  /usr/bin/time -f "MTime=%e" mustrun --must:printmem -n $num_p @CUTEST_TEALEAF_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must.txt
-done
-
 # MUST-Tsan on vanilla
 for i in `seq 1 $b_reps`; do
-  /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:printmem @CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must-tsan.txt
+  /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:stacktrace none --must:printmem @CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must-tsan.txt
 done
 
 # Cucorr instrumentation
@@ -72,7 +67,7 @@ done
 
 # Full: MUST+Cucorr instrumentation
 for i in `seq 1 $b_reps`; do
-  /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:printmem @CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-must-cucorr.txt
+  /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:stacktrace none --must:printmem @CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-must-cucorr.txt
 done
 
 "@CUTEST_SUPPORT_DIR@"/make_info.sh fin
