@@ -2,8 +2,8 @@
 
 #SBATCH -A project02416
 #SBATCH -J cucorr_jacobi
-#SBATCH -e /work/projects/project02416/jacobi-%j/%x.out
-#SBATCH -o /work/projects/project02416/jacobi-%j/%x.out
+#SBATCH -e /work/projects/project02416/jacobi-counter-%j/%x.out
+#SBATCH -o /work/projects/project02416/jacobi-counter-%j/%x.out
 # CPU
 #SBATCH -N @CUTEST_NP@                  # 2 Nodes
 #SBATCH -n 96                 # 1 Task
@@ -35,10 +35,10 @@ export MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket"
 
 
 must_layout=@CUTEST_MUST_LAYOUT_FILE@
-bench_base_path=/work/projects/project02416/jacobi-$SLURM_JOB_ID
+bench_base_path=/work/projects/project02416/jacobi-counter-$SLURM_JOB_ID
 num_p=@CUTEST_NP@
 
-b_reps=5
+b_reps=1
 
 mkdir -p "$bench_base_path"
 

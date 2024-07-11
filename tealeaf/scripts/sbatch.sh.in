@@ -2,8 +2,8 @@
 
 #SBATCH -A project02416
 #SBATCH -J cucorr_tealeaf
-#SBATCH -e /work/projects/project02416/tealeaf-%j/%x.out
-#SBATCH -o /work/projects/project02416/tealeaf-%j/%x.out
+#SBATCH -e /work/projects/project02416/tealeaf-counter-%j/%x.out
+#SBATCH -o /work/projects/project02416/tealeaf-counter-%j/%x.out
 # CPU
 #SBATCH -N @CUTEST_NP@                  # @CUTEST_NP@ Nodes
 #SBATCH -n 96                 # 1 Task
@@ -34,10 +34,10 @@ export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppressio
 export MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket"
 
 must_layout=@CUTEST_MUST_LAYOUT_FILE@
-bench_base_path=/work/projects/project02416/tealeaf-$SLURM_JOB_ID
+bench_base_path=/work/projects/project02416/tealeaf-counter-$SLURM_JOB_ID
 num_p=@CUTEST_NP@
 
-b_reps=5
+b_reps=1
 
 mkdir -p "$bench_base_path"
 
