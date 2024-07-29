@@ -145,7 +145,8 @@ set(CUTESTS_SUITES
   all
   staging
   cuda-to-mpi
-  mpi-to-cuda  
+  mpi-to-cuda
+  cuda-only
 )
 
 cutests_add_lit_target(SUITES ${CUTESTS_SUITES})
