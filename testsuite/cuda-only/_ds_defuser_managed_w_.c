@@ -3,8 +3,9 @@
 // RUN: %tsan-options %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
-// CHECK-NOT: data race
-// CHECK-NOT: [Error] sync
+// CHECK-NOT: ThreadSanitizer: data race
+// CHECK-NOT: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-NOT: [Error]
 
 #include "../support/gpu_mpi.h"
 #include <unistd.h>
@@ -54,7 +55,7 @@ int main(int argc, char *argv[]) {
       d_data2, size, 128, 1);
   // Then if we sync on the last kernel we also know that the previous 2 must
   // also be finished
-  cudaStreamSynchronize(stream2);
+  cudaStreamSynchronize(stream2); // TEST FIX
 
   for (int i = 0; i < size; i++) {
     if (managed_data[i] == 0) {

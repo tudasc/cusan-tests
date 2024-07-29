@@ -3,8 +3,9 @@
 // RUN: %tsan-options %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
-// CHECK-DAG: data race
-// CHECK-DAG: [Error] sync
+// CHECK-DAG: ThreadSanitizer: data race
+// CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-DAG: [Error]
 
 #include "../support/gpu_mpi.h"
 #include <unistd.h>

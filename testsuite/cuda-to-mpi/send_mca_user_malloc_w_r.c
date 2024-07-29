@@ -3,8 +3,8 @@
 // RUN: %cucorr-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
-// CHECK-DAG: ThreadSanitizer: data race
-// CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-NOT: ThreadSanitizer: data race
+// CHECK-NOT: Thread T{{[0-9]+}} 'cuda_stream'
 
 // REQUIRES: mca-rules
 
@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
     // function might be synchronous with respect to host."
     cudaMemcpyAsync(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost,
                     stream1);
+    cudaStreamSynchronize(stream1);  // TEST FIX
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
 
     cudaStreamSynchronize(stream1);
