@@ -3,12 +3,11 @@
 // RUN: %cucorr-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
-// CHECK-DAG: ThreadSanitizer: data race
-// CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-NOT: ThreadSanitizer: data race
+// CHECK-NOT: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-NOT: [Error] sync
 
 #include "../support/gpu_mpi.h"
-
-
 
 __global__ void kernel(int *arr, const int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -47,27 +46,35 @@ int main(int argc, char *argv[]) {
 
   int *d_data;
   cudaMalloc(&d_data, size * sizeof(int));
-
-  // Create a CUDA stream
-  cudaStream_t stream;
-  cudaStreamCreate(&stream);
-
-  cudaMemsetAsync(d_data,1,size*sizeof(int), stream);
-  cudaStreamSynchronize(stream);
+  cudaMemset(d_data, 0, size * sizeof(int));
+  cudaDeviceSynchronize();
 
   if (world_rank == 0) {
-    kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(d_data, size);
-    //cudaStreamSynchronize(stream); // FIXME: uncomment for correct execution
+    cudaStream_t stream1;
+    // cudaStream_t stream2;
+    cudaStreamCreate(&stream1);
+    // cudaStreamCreate(&stream2);
+    int *h_data = (int *)malloc(size * sizeof(int));
+
+    kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
+    // https://docs.nvidia.com/cuda/cuda-runtime-api/api-sync-behavior.html#api-sync-behavior__memcpy-async
+    // "For transfers from any host memory to any host memory, the function is
+    // fully synchronous with respect to the host."
+    cudaMemcpyAsync(h_data, h_data, 1 * sizeof(int), cudaMemcpyHostToHost,
+                    stream1);
+
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
+
+    cudaStreamSynchronize(stream1);
+    cudaStreamDestroy(stream1);
+    free(h_data);
   } else if (world_rank == 1) {
     MPI_Recv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
   if (world_rank == 1) {
     int *h_data = (int *)malloc(size * sizeof(int));
-    cudaMemcpyAsync(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost,
-                    stream);
-    cudaStreamSynchronize(stream);
+    cudaMemcpy(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost);
     for (int i = 0; i < size; i++) {
       const int buf_v = h_data[i];
       if (buf_v == 0) {
@@ -78,7 +85,7 @@ int main(int argc, char *argv[]) {
     free(h_data);
   }
 
-  cudaStreamDestroy(stream);
+  cudaDeviceSynchronize();
   cudaFree(d_data);
   MPI_Finalize();
   return 0;

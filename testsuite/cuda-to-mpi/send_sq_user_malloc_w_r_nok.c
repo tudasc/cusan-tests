@@ -56,9 +56,7 @@ int main(int argc, char *argv[]) {
 
   if (world_rank == 0) {
     kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(d_data, size);
-#ifdef CUCORR_SYNC
-    while(cudaStreamQuery(stream) != cudaSuccess) { } // FIXME: uncomment for correct execution
-#endif
+    //while(cudaStreamQuery(stream) != cudaSuccess) { } // FIXME: uncomment for correct execution
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
   } else if (world_rank == 1) {
     MPI_Recv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
