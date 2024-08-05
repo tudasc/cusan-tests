@@ -1,5 +1,5 @@
 // clang-format off
-// RUN: %cucorr-mpicxx %tsan-compile-flags -O1 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
+// RUN: %cusan-mpicxx %tsan-compile-flags -O1 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
 // RUN: %tsan-options %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 
 // clang-format on
@@ -10,8 +10,7 @@
 #include <cstdio>
 #include <cuda_runtime.h>
 
-__global__ void write_kernel_delay(int *arr, const int N,
-                                   const unsigned int delay) {
+__global__ void write_kernel_delay(int* arr, const int N, const unsigned int delay) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
 #if __CUDA_ARCH__ >= 700
   for (int i = 0; i < tid; i++) {
@@ -26,18 +25,18 @@ __global__ void write_kernel_delay(int *arr, const int N,
 }
 
 int main() {
-  const int size = 256;
+  const int size            = 256;
   const int threadsPerBlock = size;
-  const int blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock;
+  const int blocksPerGrid   = (size + threadsPerBlock - 1) / threadsPerBlock;
 
   cudaStream_t stream1;
   cudaStream_t stream2;
   cudaStreamCreate(&stream1);
   cudaStreamCreate(&stream2);
 
-  int *data;
-  int *data2;
-  int *h_data = (int *)malloc(size * sizeof(int));
+  int* data;
+  int* data2;
+  int* h_data = (int*)malloc(size * sizeof(int));
   cudaMalloc(&data, size * sizeof(int));
   cudaMemset(data, 0, size * sizeof(int));
   cudaHostAlloc(&data2, size * sizeof(int), 0);
@@ -45,9 +44,9 @@ int main() {
 
   cudaDeviceSynchronize();
 
-  //write on data
+  // write on data
   write_kernel_delay<<<blocksPerGrid, threadsPerBlock, 0, stream1>>>(data, size, 1316134912);
-  //do a free which implicitly syncs/blocks
+  // do a free which implicitly syncs/blocks
   cudaFreeHost(data2);
 
   cudaMemcpyAsync(h_data, data, size * sizeof(int), cudaMemcpyDefault, stream2);

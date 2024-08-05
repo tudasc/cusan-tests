@@ -74,8 +74,8 @@ function(configure_cutests_lit_site_cfg input output)
   
   set(CUTESTS_PROJECT_DIR ${PROJECT_SOURCE_DIR})
   set(CUTESTS_BUILD_DIR ${CMAKE_BINARY_DIR})
-  set(CUTESTS_TEST_CUCORR_DIR ${CMAKE_BINARY_DIR}/testsuite-exec)
-  file(MAKE_DIRECTORY ${CUTESTS_TEST_CUCORR_DIR})
+  set(CUTESTS_TEST_CUSAN_DIR ${CMAKE_BINARY_DIR}/testsuite-exec)
+  file(MAKE_DIRECTORY ${CUTESTS_TEST_CUSAN_DIR})
 
   file(READ ${input} contents)
   string(CONFIGURE "${contents}" contents @ONLY)
@@ -155,7 +155,7 @@ cutests_add_lit_target(SUITES ${CUTESTS_SUITES})
 add_test(
   NAME cutests-lit-suite
   COMMAND
-    ${CUCORR_LIT_EXEC} -j 1 --param
+    ${CUTESTS_LIT_EXEC} -j 1 --param
     cutests_site_config=${CMAKE_CURRENT_BINARY_DIR}/lit.site.cfg
     ${CMAKE_CURRENT_SOURCE_DIR}
 )

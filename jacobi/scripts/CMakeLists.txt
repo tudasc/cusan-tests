@@ -23,14 +23,14 @@ function(add_build_clean_target name dir)
     
     add_custom_target(${name}-vanilla-build
         COMMAND "make" clean
-        COMMAND ./build.sh CUCORR_WRAPPER=OFF
+        COMMAND ./build.sh CUSAN_WRAPPER=OFF
         WORKING_DIRECTORY ${dir}
         DEPENDS cutest_memusage
     )
 
     add_custom_target(${name}-tsan-vanilla-build
         COMMAND "make" clean
-        COMMAND ./build.sh CUCORR_WRAPPER=OFF -fsanitize=thread
+        COMMAND ./build.sh CUSAN_WRAPPER=OFF -fsanitize=thread
         WORKING_DIRECTORY ${dir}
         DEPENDS cutest_memusage
     )
@@ -60,15 +60,15 @@ function(add_build_clean_target name dir)
     )
     
     add_custom_target(${name}-vanilla-run
-        COMMAND ./run.sh CUCORR_WRAPPER=OFF
+        COMMAND ./run.sh CUSAN_WRAPPER=OFF
         WORKING_DIRECTORY ${dir}
     )
 endfunction()
 
 
 set(CUTEST_NP 2)
-set(CUCORR_YAML_DIR ${PROJECT_SOURCE_DIR}/jacobi)
-set(CUCORR_SUPPRESSION_DIR ${PROJECT_SOURCE_DIR}/jacobi/scripts)
+set(CUSAN_YAML_DIR ${PROJECT_SOURCE_DIR}/jacobi)
+set(CUSAN_SUPPRESSION_DIR ${PROJECT_SOURCE_DIR}/jacobi/scripts)
 set(CUTEST_SUPPORT_DIR ${PROJECT_SOURCE_DIR}/support)
 set(CUTEST_MUST_LAYOUT_FILE ${PROJECT_SOURCE_DIR}/support/must-mpi-layout-${CUTEST_NP}.xml)
 get_filename_component(MUST_BIN_DIR "${must_run}" DIRECTORY ABSOLUTE)
@@ -84,7 +84,7 @@ configure_jacobi_cfg(${CMAKE_CURRENT_SOURCE_DIR}/run.sh.in
 
 function (make_sbatch target file_in file_out)
   set(CUTEST_JACOBI_BASEEXE ${PROJECT_SOURCE_DIR}/jacobi/bin/jacobi_cuda_aware_mpi)
-  set(CUTEST_JACOBI_CUCORR ${CUTEST_JACOBI_BASEEXE}_cucorr)
+  set(CUTEST_JACOBI_CUSAN ${CUTEST_JACOBI_BASEEXE}_cusan)
   set(CUTEST_JACOBI_VANILLA ${CUTEST_JACOBI_BASEEXE}_vanilla)
   set(CUTEST_JACOBI_TSAN_VANILLA ${CUTEST_JACOBI_BASEEXE}_tsan_vanilla)
 

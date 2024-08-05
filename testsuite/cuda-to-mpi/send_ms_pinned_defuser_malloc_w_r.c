@@ -1,6 +1,6 @@
 // clang-format off
-// RUN: %cucorr-mpicxx %tsan-compile-flags -O2 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
-// RUN: %cucorr-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
+// RUN: %cusan-mpicxx %tsan-compile-flags -O2 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
+// RUN: %cusan-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
 // CHECK-NOT: ThreadSanitizer: data race
@@ -9,9 +9,7 @@
 
 #include "../support/gpu_mpi.h"
 
-
-
-__global__ void kernel(int *arr, const int N) {
+__global__ void kernel(int* arr, const int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   if (tid < N) {
 #if __CUDA_ARCH__ >= 700
@@ -25,16 +23,15 @@ __global__ void kernel(int *arr, const int N) {
   }
 }
 
-
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   if (!has_gpu_aware_mpi()) {
     printf("[Error] This example is designed for CUDA-aware MPI. Exiting.\n");
     return 1;
   }
 
-  const int size = 512;
+  const int size            = 512;
   const int threadsPerBlock = size;
-  const int blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock;
+  const int blocksPerGrid   = (size + threadsPerBlock - 1) / threadsPerBlock;
 
   MPI_Init(&argc, &argv);
   int world_size, world_rank;
@@ -47,27 +44,28 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  int *d_data;
+  int* d_data;
   cudaMalloc(&d_data, size * sizeof(int));
-  cudaMemset(d_data,0,size*sizeof(int));
+  cudaMemset(d_data, 0, size * sizeof(int));
   cudaDeviceSynchronize();
 
   if (world_rank == 0) {
     cudaStream_t stream;
     cudaStreamCreate(&stream);
 
-    int *h_pinned_data;
-    const int pinned_size=sizeof(int);//1024 * size * sizeof(int);
-    if (cudaMallocHost((void **) &h_pinned_data, pinned_size) != cudaSuccess){
+    int* h_pinned_data;
+    const int pinned_size = sizeof(int);  // 1024 * size * sizeof(int);
+    if (cudaMallocHost((void**)&h_pinned_data, pinned_size) != cudaSuccess) {
       printf("[Error] Allocating pinned memory.\n");
     }
     cudaDeviceSynchronize();
 
     kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(d_data, size);
-    cudaMemset(h_pinned_data, 1, pinned_size); // here memset is sync with host due to pinned host mem. 
+    cudaMemset(h_pinned_data, 1,
+               pinned_size);  // here memset is sync with host due to pinned host mem.
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
 
-    cudaStreamSynchronize(stream);    
+    cudaStreamSynchronize(stream);
     cudaFreeHost(h_pinned_data);
     cudaStreamDestroy(stream);
   } else if (world_rank == 1) {
@@ -75,7 +73,7 @@ int main(int argc, char *argv[]) {
   }
 
   if (world_rank == 1) {
-    int *h_data = (int *)malloc(size * sizeof(int));
+    int* h_data = (int*)malloc(size * sizeof(int));
     cudaMemcpy(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost);
     for (int i = 0; i < size; i++) {
       const int buf_v = h_data[i];
@@ -86,7 +84,6 @@ int main(int argc, char *argv[]) {
     }
     free(h_data);
   }
-
 
   cudaDeviceSynchronize();
   cudaFree(d_data);

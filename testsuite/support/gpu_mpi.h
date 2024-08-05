@@ -44,4 +44,4 @@ inline bool has_gpu_aware_mpi() {
 }
 #endif
 
-#endif // CUTESTS_GPUAWAREMPI_H
+#endif  // CUTESTS_GPUAWAREMPI_H

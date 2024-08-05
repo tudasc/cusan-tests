@@ -5,18 +5,18 @@ import re
 def counter_gen(out_file, tealeaf_in, jacobi_in, stats ):
     dataset = {}
     
-    verify_matcher = re.compile("Cucorr runtime statistics")
-    cucorr_matcher = re.compile(r".*_calls\s*:\s*\d+")
+    verify_matcher = re.compile("Cusan runtime statistics")
+    cusan_matcher = re.compile(r".*_calls\s*:\s*\d+")
     tsan_matcher = re.compile(r"Tsan.*\s*:\s*\d+")
     for filename in [tealeaf_in, jacobi_in]:
         print(filename)
         with open(filename) as file:
             data = file.read()
             if (len(verify_matcher.findall(data))==0):
-                print(f"ERROR: Couldnt get Cucorr runtime stats from {filename}")
+                print(f"ERROR: Couldnt get CuSan runtime stats from {filename}")
                 continue
 
-        res = cucorr_matcher.findall(data) + tsan_matcher.findall(data)
+        res = cusan_matcher.findall(data) + tsan_matcher.findall(data)
         res = [[x.split(":")[0].strip(), int(x.split(":")[1])] for x in res]
         exp_name = "-".join(filename.split("/")[-1:]).split(".")[0]
         if exp_name not in dataset:
@@ -171,8 +171,8 @@ def mem_runtime_handle(out_name, folder1, folder2):
             "vanilla",
             "vanilla-tsan",
             "vanilla-must-tsan",
-            "cucorr",
-            "must-cucorr",
+            "cusan",
+            "must-cusan",
         ]
         for key in sorted(list(keys), key = lambda x: order.index(x)):
             v1 = dataset1[key]
@@ -189,8 +189,8 @@ if __name__ == "__main__":
     #generates table of counters given outputname an 2 files and a list of stats
     print("==== COUNTER ====")
     counter_gen("./out/counter",
-                   "./data/tealeaf-counter-46158893/tealeaf-cucorr.txt",
-                   "./data/jacobi-counter-46158891/jacobi-cucorr.txt",
+                   "./data/tealeaf-counter-46158893/tealeaf-cusan.txt",
+                   "./data/jacobi-counter-46158891/jacobi-cusan.txt",
                     ["\\hline\\\\\n", "kernel_register_calls", "TsanMemoryRead", "TsanMemoryWrite", "TsanSwitchToFiber"]
                     )
     #generates scaling tikz graph based on outname and folder of bench files

@@ -1,6 +1,6 @@
 // clang-format off
-// RUN: %cucorr-mpicxx %tsan-compile-flags -O2 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
-// RUN: %cucorr-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
+// RUN: %cusan-mpicxx %tsan-compile-flags -O2 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
+// RUN: %cusan-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
 // CHECK-NOT: ThreadSanitizer: data race
@@ -12,7 +12,8 @@
 #include <cstdio>
 #include <cuda_runtime.h>
 
-template <typename F> __global__ void kernel_functor(F functor) {
+template <typename F>
+__global__ void kernel_functor(F functor) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
 #if __CUDA_ARCH__ >= 700
   for (int i = 0; i < tid; i++) {
@@ -20,19 +21,19 @@ template <typename F> __global__ void kernel_functor(F functor) {
   }
 #else
   printf(">>> __CUDA_ARCH__ !\n");
-#endif`
+#endif `
   functor(tid);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   if (!has_gpu_aware_mpi()) {
     printf("[Error] This example is designed for CUDA-aware MPI. Exiting.\n");
     return 1;
   }
 
-  const int size = 512;
+  const int size            = 512;
   const int threadsPerBlock = size;
-  const int blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock;
+  const int blocksPerGrid   = (size + threadsPerBlock - 1) / threadsPerBlock;
 
   MPI_Init(&argc, &argv);
   int world_size, world_rank;
@@ -45,25 +46,22 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  int *d_data;
+  int* d_data;
   cudaMallocManaged(&d_data, size * sizeof(int));
   cudaMemset(d_data, 0, size * sizeof(int));
   cudaDeviceSynchronize();
 
   if (world_rank == 0) {
-    const auto lamba_kernel = [=] __host__ __device__(const int tid) {
-      d_data[tid] = (tid + 1);
-    };
-    kernel_functor<decltype(lamba_kernel)>
-        <<<blocksPerGrid, threadsPerBlock>>>(lamba_kernel);
-    cudaDeviceSynchronize(); // TEST FIX
+    const auto lamba_kernel = [=] __host__ __device__(const int tid) { d_data[tid] = (tid + 1); };
+    kernel_functor<decltype(lamba_kernel)><<<blocksPerGrid, threadsPerBlock>>>(lamba_kernel);
+    cudaDeviceSynchronize();  // TEST FIX
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
   } else if (world_rank == 1) {
     MPI_Recv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
   if (world_rank == 1) {
-    int *h_data = (int *)malloc(size * sizeof(int));
+    int* h_data = (int*)malloc(size * sizeof(int));
     cudaMemcpy(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost);
     for (int i = 0; i < size; i++) {
       const int buf_v = h_data[i];

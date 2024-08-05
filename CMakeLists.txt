@@ -1,44 +1,44 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(cucorr-tests)
+project(cusan-tests)
 
 
-set(CUCORR_PATH "${PROJECT_SOURCE_DIR}/cucorr/install" CACHE STRING "Path to cucorr installation")
+set(CUSAN_PATH "${PROJECT_SOURCE_DIR}/cusan/install" CACHE STRING "Path to CuSan installation")
 
-if(NOT IS_DIRECTORY ${CUCORR_PATH})
-  if(DEFINED ENV{CUCORR_PATH})
-    set(CUCORR_PATH $ENV{CUCORR_PATH} CACHE STRING "" FORCE)
+if(NOT IS_DIRECTORY ${CUSAN_PATH})
+  if(DEFINED ENV{CUSAN_PATH})
+    set(CUSAN_PATH $ENV{CUSAN_PATH} CACHE STRING "" FORCE)
   endif()
 endif()
 
-if(NOT DEFINED CUCORR_PATH OR NOT IS_DIRECTORY ${CUCORR_PATH})
-  message(WARNING "Path to cucorr installation not set correctly (${CUCORR_PATH})")
+if(NOT DEFINED CUSAN_PATH OR NOT IS_DIRECTORY ${CUSAN_PATH})
+  message(WARNING "Path to cusan installation not set correctly (${CUSAN_PATH})")
 endif()
 
-message(STATUS "Path to cucorr installation is set to ${CUCORR_PATH}")
+message(STATUS "Path to cusan installation is set to ${CUSAN_PATH}")
 
 find_package(MPI REQUIRED)
 
 # Not so portable, but suffices
-find_program(cucorr_mpicxx
-    cucorr-mpic++
-    PATHS ${CUCORR_PATH} ${CUCORR_PATH}/bin
+find_program(cusan_mpicxx
+    NAMES cusan-mpic++
+    PATHS ${CUSAN_PATH} ${CUSAN_PATH}/bin
     NO_DEFAULT_PATH
 )
-find_program(cucorr_mpicc
-    cucorr-mpicc
-    PATHS ${CUCORR_PATH} ${CUCORR_PATH}/bin
+find_program(cusan_mpicc
+    NAME cusan-mpicc
+    PATHS ${CUSAN_PATH} ${CUSAN_PATH}/bin
     NO_DEFAULT_PATH
 )
-find_library(lib_cucorr_runtime
-    NAMES CucorrRuntime
-    PATHS ${CUCORR_PATH}/lib ${CUCORR_PATH}
+find_library(lib_cusan_runtime
+    NAMES CusanRuntime
+    PATHS ${CUSAN_PATH}/lib ${CUSAN_PATH}
     NO_DEFAULT_PATH
 )
 
-find_library(lib_cucorr_interceptor
-    NAMES CucorrMPIInterceptor
-    PATHS ${CUCORR_PATH}/lib ${CUCORR_PATH}
+find_library(lib_cusan_interceptor
+    NAMES CusanMPIInterceptor
+    PATHS ${CUSAN_PATH}/lib ${CUSAN_PATH}
     NO_DEFAULT_PATH
 )
 
@@ -48,10 +48,10 @@ find_program(must_run
     NO_DEFAULT_PATH
 )
 
-message(STATUS "cucorr mpicc wrapper is set to ${cucorr_mpicc}")
-message(STATUS "cucorr mpicxx wrapper is set to ${cucorr_mpicxx}")
-message(STATUS "cucorr lib is set to ${lib_cucorr_runtime}")
-message(STATUS "cucorr interceptor lib is set to ${lib_cucorr_interceptor}")
+message(STATUS "cusan mpicc wrapper is set to ${cusan_mpicc}")
+message(STATUS "cusan mpicxx wrapper is set to ${cusan_mpicxx}")
+message(STATUS "cusan lib is set to ${lib_cusan_runtime}")
+message(STATUS "cusan interceptor lib is set to ${lib_cusan_interceptor}")
 message(STATUS "MUST mustrun is set to ${must_run}")
 
 enable_testing()

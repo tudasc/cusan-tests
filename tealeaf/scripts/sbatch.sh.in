@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH -A project02416
-#SBATCH -J cucorr_tealeaf
+#SBATCH -J cusan_tealeaf
 #SBATCH -e /work/projects/project02416/tealeaf-%j/%x.out
 #SBATCH -o /work/projects/project02416/tealeaf-%j/%x.out
 # CPU
@@ -26,10 +26,10 @@ export OMP_NUM_THREADS=1
 
 export PATH="@MUST_BIN_DIR@":$PATH
 
-export TYPEART_TYPE_FILE="@CUCORR_YAML_DIR@/types-tealeaf.yaml"
-export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-tealeaf.yaml"
+export TYPEART_TYPE_FILE="@CUSAN_YAML_DIR@/types-tealeaf.yaml"
+export CUSAN_KERNEL_DATA_FILE="@CUSAN_YAML_DIR@/kernel-tealeaf.yaml"
 
-export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppression-lb2.txt"
+export TSAN_OPTIONS="exitcode=0 suppressions=@CUSAN_SUPPRESSION_DIR@/suppression-lb2.txt"
 
 export MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket"
 
@@ -43,7 +43,7 @@ mkdir -p "$bench_base_path"
 
 "@CUTEST_SUPPORT_DIR@"/make_info.sh "${must_layout}"
 
-cd "@CUTEST_TEALEAF_CUCORR_BUILD_BASE@"/
+cd "@CUTEST_TEALEAF_CUSAN_BUILD_BASE@"/
 
 # Without any modifications (vanilla)
 for i in `seq 1 $b_reps`; do
@@ -60,14 +60,14 @@ for i in `seq 1 $b_reps`; do
   /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:stacktrace none --must:printmem @CUTEST_TEALEAF_TSAN_VANILLA@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-vanilla-must-tsan.txt
 done
 
-# Cucorr instrumentation
+# CuSan instrumentation
 for i in `seq 1 $b_reps`; do
-  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "MTime=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p @CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-cucorr.txt
+  LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "MTime=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p @CUTEST_TEALEAF_CUSAN@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-cusan.txt
 done
 
-# Full: MUST+Cucorr instrumentation
+# Full: MUST+CuSan instrumentation
 for i in `seq 1 $b_reps`; do
-  /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:stacktrace none --must:printmem @CUTEST_TEALEAF_CUCORR@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-must-cucorr.txt
+  /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:stacktrace none --must:printmem @CUTEST_TEALEAF_CUSAN@ @CUTEST_TEALEAF_ARGS@ &>> "${bench_base_path}"/tealeaf-must-cusan.txt
 done
 
 "@CUTEST_SUPPORT_DIR@"/make_info.sh fin

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-export TYPEART_TYPE_FILE="@CUCORR_YAML_DIR@/types-jacobi.yaml"
-export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-jacobi.yaml"
+export TYPEART_TYPE_FILE="@CUSAN_YAML_DIR@/types-jacobi.yaml"
+export CUSAN_KERNEL_DATA_FILE="@CUSAN_YAML_DIR@/kernel-jacobi.yaml"
 
-export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppression-lb2.txt"
+export TSAN_OPTIONS="exitcode=0 suppressions=@CUSAN_SUPPRESSION_DIR@/suppression-lb2.txt"
 
 export PATH="@MUST_BIN_DIR@":$PATH
 
@@ -17,7 +17,7 @@ if [ "$preflag" = "must-tsan" ]; then
 fi
 
 if [ -z "$preflag" ]; then
-    LD_PRELOAD="@lib_cucorr_interceptor@" /usr/bin/time -f "Time=%e" mpiexec -np 2 ./bin/jacobi_cuda_aware_mpi_cucorr @CUTEST_JACOBI_ARGS@ 
+    LD_PRELOAD="@lib_cusan_interceptor@" /usr/bin/time -f "Time=%e" mpiexec -np 2 ./bin/jacobi_cuda_aware_mpi_cusan @CUTEST_JACOBI_ARGS@ 
 else
     /usr/bin/time -f "Time=%e" mpiexec -np 2 ./bin/jacobi_cuda_aware_mpi_tsan_vanilla @CUTEST_JACOBI_ARGS@ 
 fi

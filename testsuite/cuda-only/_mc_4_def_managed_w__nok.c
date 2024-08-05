@@ -1,5 +1,5 @@
 // clang-format off
-// RUN: %cucorr-mpicxx %tsan-compile-flags -O2 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
+// RUN: %cusan-mpicxx %tsan-compile-flags -O2 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
 // RUN: %tsan-options %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
@@ -11,7 +11,7 @@
 
 #include "../support/gpu_mpi.h"
 
-__global__ void kernel(int *arr, const int N) {
+__global__ void kernel(int* arr, const int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   if (tid < N) {
 #if __CUDA_ARCH__ >= 700
@@ -25,11 +25,10 @@ __global__ void kernel(int *arr, const int N) {
   }
 }
 
-int main(int argc, char *argv[]) {
-
-  const int size = 512;
+int main(int argc, char* argv[]) {
+  const int size            = 512;
   const int threadsPerBlock = size;
-  const int blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock;
+  const int blocksPerGrid   = (size + threadsPerBlock - 1) / threadsPerBlock;
 
   int *d_data, *m_data;
   cudaMalloc(&d_data, size * sizeof(int));
