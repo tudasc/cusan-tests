@@ -9,8 +9,9 @@
 
 #include <cstdio>
 #include <cuda_runtime.h>
+#include <unistd.h>
 
-__global__ void write_kernel_delay(int* arr, const int N, const unsigned int delay) {
+__global__ void write_kernel_delay(int* arr, const int N, const int value, const unsigned int delay) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
 #if __CUDA_ARCH__ >= 700
   for (int i = 0; i < tid; i++) {
@@ -20,7 +21,7 @@ __global__ void write_kernel_delay(int* arr, const int N, const unsigned int del
   printf(">>> __CUDA_ARCH__ !\n");
 #endif
   if (tid < N) {
-    arr[tid] = (tid + 1);
+    arr[tid] = value;
   }
 }
 
@@ -45,9 +46,14 @@ int main() {
   cudaDeviceSynchronize();
 
   // write on data
-  write_kernel_delay<<<blocksPerGrid, threadsPerBlock, 0, stream1>>>(data, size, 1316134912);
+  write_kernel_delay<<<blocksPerGrid, threadsPerBlock, 0, stream1>>>(data, size, 0, 1316134912);
   // do a free which implicitly syncs/blocks
   cudaFree(data2);
+  write_kernel_delay<<<blocksPerGrid, threadsPerBlock, 0, stream2>>>(data, size, 255, 1);
+
+  // sleep 1 second to allow the first kernel to overwrite some data
+  sleep(1);
+
 
   cudaMemcpyAsync(h_data, data, size * sizeof(int), cudaMemcpyDefault, stream2);
   cudaStreamSynchronize(stream2);
