@@ -58,6 +58,11 @@ function(add_build_clean_target name dir)
         COMMAND ./run.sh
         WORKING_DIRECTORY ${dir}
     )
+
+    add_custom_target(${name}-must-run
+        COMMAND ./run.sh must-tsan
+        WORKING_DIRECTORY ${dir}
+    )
     
     add_custom_target(${name}-vanilla-run
         COMMAND ./run.sh CUSAN_WRAPPER=OFF

@@ -1,8 +1,10 @@
 #!/bin/bash
 
-module purge
-ml gcc/11 cuda openmpi git python
-ml clang/14
+function cusan_modules() {
+    module purge
+    ml gcc/11 cuda openmpi git python
+    ml clang/14
+}
 
 export CC=clang
 export CXX=clang++
@@ -21,7 +23,7 @@ echo "Build to $build_f ; Install to $install_f"
 
 function cusan_fetch() {
     cd "$base_cusan_f"
-    git clone -b devel --single-branch git@github.com:ahueck/cusan.git cusan
+    git clone https://github.com/ahueck/cusan.git cusan
 }
 
 function cusan_config() {
@@ -30,11 +32,12 @@ function cusan_config() {
     cmake .. \
         -DCMAKE_INSTALL_PREFIX="$install_f" \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCUSAN_FIBERPOOL=ON \
+        -DCUSAN_FIBERPOOL=OFF \
         -DCUSAN_SOFTCOUNTER=OFF \
         -DCUSAN_SYNC_DETAIL_LEVEL=ON \
         -DTYPEART_SOFTCOUNTERS=OFF \
-        -DTYPEART_SHOW_STATS=OFF
+        -DTYPEART_SHOW_STATS=OFF  \
+        -DTYPEART_MPI_INTERCEPT_LIB=OFF
 }
 
 function cusan_install() {

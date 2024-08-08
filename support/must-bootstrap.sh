@@ -1,8 +1,10 @@
 #!/bin/bash
 
-module purge
-ml gcc/11 cuda openmpi git python
-ml clang/14
+function must_modules() {
+    module purge
+    ml gcc/11 cuda openmpi git python
+    ml clang/14
+}
 
 export CC=clang
 export CXX=clang++
@@ -28,9 +30,16 @@ function must_fetch() {
     git submodule update --recursive --init
 }
 
-functioned must_patch() {
+function must_patch() {
     cd "$base_must_f"/must-tsan
     git apply "${script_dir}"/must-changes.patch
+}
+
+function must_download() {
+    cd "$base_must_f"
+    wget http://hpc.rwth-aachen.de/must/files/MUST-v1.10.0-fiber-preview.tar.gz
+    tar -xzvf MUST-v1.10.0-fiber-preview.tar.gz
+    mv MUST-v1.10.0-beta must-tsan
 }
 
 function must_config() {
@@ -47,8 +56,9 @@ function must_install() {
     make -j32 install install-prebuilds
 }
 
-must_fetch
-must_patch
+#must_fetch
+#must_patch
+must_download
 must_config
 must_install
 
