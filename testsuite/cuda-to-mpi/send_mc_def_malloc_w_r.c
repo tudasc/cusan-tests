@@ -5,7 +5,7 @@
 
 // CHECK-NOT: ThreadSanitizer: data race
 // CHECK-NOT: Thread T{{[0-9]+}} 'cuda_stream'
-// CHECK-NOT: [Error]
+// CHECK-NOT: [Error] sync
 
 #include "../support/gpu_mpi.h"
 

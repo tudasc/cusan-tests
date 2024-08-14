@@ -5,7 +5,7 @@
 
 // CHECK-NOT: ThreadSanitizer: data race
 // CHECK-NOT: Thread T{{[0-9]+}} 'cuda_stream'
-// CHECK-NOT: [Error]
+// CHECK-NOT: [Error] sync
 
 #include "../support/gpu_mpi.h"
 
@@ -52,8 +52,9 @@ int main(int argc, char* argv[]) {
   if (world_rank == 0) {
     int* d_sum;
     cudaMalloc(&d_sum, size * sizeof(int));
+    //kernel only reads d_data
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_sum, d_data, size);
-
+    //same with mpi as such theres no race
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
     cudaFree(d_sum);
   } else if (world_rank == 1) {

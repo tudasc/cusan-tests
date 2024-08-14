@@ -5,7 +5,7 @@
 
 // CHECK-DAG: ThreadSanitizer: data race
 // CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
-// CHECK-DAG: [Error]
+// CHECK-DAG: [Error] sync
 
 #include "../support/gpu_mpi.h"
 
@@ -53,10 +53,9 @@ int main(int argc, char* argv[]) {
 
   if (world_rank == 0) {
     const auto lamba_kernel = [=] __host__ __device__(const int tid) { d_data[tid] = (tid + 1); };
+    //the kernel indirectly writes the d_data via the lambda function
     kernel_functor<decltype(lamba_kernel)><<<blocksPerGrid, threadsPerBlock>>>(lamba_kernel);
-#ifdef cusan_SYNC
-    cudaDeviceSynchronize();  // FIXME: uncomment for correct execution
-#endif
+    //and so we get a race with mpi
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
   } else if (world_rank == 1) {
     MPI_Recv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);

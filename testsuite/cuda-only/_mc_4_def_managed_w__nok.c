@@ -5,7 +5,7 @@
 
 // CHECK-DAG: ThreadSanitizer: data race
 // CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
-// CHECK-DAG: [Error]
+// CHECK-DAG: [Error] sync
 
 // REQUIRES: mca-rules
 

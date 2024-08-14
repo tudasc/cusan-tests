@@ -3,8 +3,8 @@
 // RUN: %tsan-options %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 
 // clang-format on
-
-// CHECK-NOT: data race
+ 
+// CHECK-NOT: ThreadSanitizer: data race
 // CHECK-NOT: [Error] sync
 
 #include <cstdio>

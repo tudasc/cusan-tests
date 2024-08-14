@@ -4,7 +4,7 @@
 
 // clang-format on
 
-// CHECK-DAG: data race
+// CHECK-DAG: ThreadSanitizer: data race
 // CHECK-DAG: [Error] sync
 #include <cstdio>
 #include <cuda_runtime.h>

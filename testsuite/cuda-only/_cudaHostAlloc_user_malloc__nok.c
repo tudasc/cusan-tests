@@ -4,7 +4,7 @@
 
 // clang-format on
 
-// HECK-DAG: data race
+// HECK-DAG: ThreadSanitizer: data race
 // CHECK-DAG: [Error] sync
 
 #include <cstdio>

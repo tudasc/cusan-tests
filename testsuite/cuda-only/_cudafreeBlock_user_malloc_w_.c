@@ -4,7 +4,7 @@
 
 // clang-format on
 
-// CHECK-NOT: data race
+// CHECK-NOT: ThreadSanitizer: data race
 // CHECK-NOT: [Error] sync
 
 #include <cstdio>
@@ -48,7 +48,7 @@ int main() {
   write_kernel_delay<<<blocksPerGrid, threadsPerBlock, 0, stream1>>>(data, size, 1316134912);
   // do a free which implicitly syncs/blocks
   cudaFree(data2);
-
+  //so this memcpy is safe
   cudaMemcpyAsync(h_data, data, size * sizeof(int), cudaMemcpyDefault, stream2);
   cudaStreamSynchronize(stream2);
   for (int i = 0; i < size; i++) {
