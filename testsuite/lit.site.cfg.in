@@ -15,11 +15,11 @@ config.filecheck = "@CUTESTS_FILECHECK_EXEC@"
 config.mpiexec="@MPIEXEC@"
 
 # Tool specifics:
-config.cucorr_mpicc="@cucorr_mpicc@"
-config.cucorr_mpicxx="@cucorr_mpicxx@"
-config.cucorr_interceptor="@lib_cucorr_interceptor@" 
-config.cucorr_lib="@lib_cucorr_runtime@"
-config.cucorr_testdir="@CUTESTS_TEST_CUCORR_DIR@"
+config.cusan_mpicc="@cusan_mpicc@"
+config.cusan_mpicxx="@cusan_mpicxx@"
+config.cusan_interceptor="@lib_cusan_interceptor@" 
+config.cusan_lib="@lib_cusan_runtime@"
+config.cusan_testdir="@CUTESTS_TEST_CUSAN_DIR@"
 
 config.cutests_build_dir="@CUTESTS_BUILD_DIR@"
 

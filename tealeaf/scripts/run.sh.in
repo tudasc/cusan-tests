@@ -1,9 +1,9 @@
 #!/bin/bash
 
-export TYPEART_TYPE_FILE="@CUCORR_YAML_DIR@/types-tealeaf.yaml"
-export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-tealeaf.yaml"
+export TYPEART_TYPE_FILE="@CUSAN_YAML_DIR@/types-tealeaf.yaml"
+export CUSAN_KERNEL_DATA_FILE="@CUSAN_YAML_DIR@/kernel-tealeaf.yaml"
 
-export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppression-lb2.txt"
+export TSAN_OPTIONS="exitcode=0 suppressions=@CUSAN_SUPPRESSION_DIR@/suppression-lb2.txt"
 
 export PATH="@MUST_BIN_DIR@":$PATH
 
@@ -26,7 +26,7 @@ if [ ! -z "$preflag" ]; then
 fi
 
 if [ -z "$preflag" ]; then
-    LD_PRELOAD="@lib_cucorr_interceptor@" /usr/bin/time -f "Time=%e" mpiexec -np 2 ./${build_dir}_cucorr/cuda-tealeaf 
+    LD_PRELOAD="@lib_cusan_interceptor@" /usr/bin/time -f "Time=%e" mpiexec -np 2 ./${build_dir}_cusan/cuda-tealeaf 
 else
     /usr/bin/time -f "Time=%e" mpiexec -np 2 ./${build_dir}_vanilla/cuda-tealeaf 
 fi

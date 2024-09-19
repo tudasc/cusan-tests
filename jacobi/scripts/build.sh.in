@@ -1,15 +1,15 @@
 #!/bin/bash
 
-export TYPEART_TYPE_FILE="@CUCORR_YAML_DIR@/types-jacobi.yaml"
-export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-jacobi.yaml"
+export TYPEART_TYPE_FILE="@CUSAN_YAML_DIR@/types-jacobi.yaml"
+export CUSAN_KERNEL_DATA_FILE="@CUSAN_YAML_DIR@/kernel-jacobi.yaml"
 
-export CUCORR_MPICXX_EXEC="@cucorr_mpicxx@"
-export CUCORR_MPICC_EXEC="@cucorr_mpicc@"
+export CUSAN_MPICXX_EXEC="@cusan_mpicxx@"
+export CUSAN_MPICC_EXEC="@cusan_mpicc@"
 
 #export CUTEST_ADDITIONAL_CFLAGS="$2"
 
 touch $TYPEART_TYPE_FILE
-touch $CUCORR_KERNEL_DATA_FILE
+touch $CUSAN_KERNEL_DATA_FILE
 
 preflag=$1
 if [ ! -z "$preflag" ]; then
@@ -33,6 +33,6 @@ if [ ! -z "$preflag" ]; then
     mv bin/jacobi_cuda_normal_mpi bin/jacobi_cuda_normal_mpi_vanilla
   fi
 else 
-  mv bin/jacobi_cuda_aware_mpi bin/jacobi_cuda_aware_mpi_cucorr
-  mv bin/jacobi_cuda_normal_mpi bin/jacobi_cuda_normal_mpi_cucorr
+  mv bin/jacobi_cuda_aware_mpi bin/jacobi_cuda_aware_mpi_cusan
+  mv bin/jacobi_cuda_normal_mpi bin/jacobi_cuda_normal_mpi_cusan
 fi

@@ -1,6 +1,6 @@
 // clang-format off
-// RUN: %cucorr-mpicxx %tsan-compile-flags -O2 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
-// RUN: %cucorr-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
+// RUN: %cusan-mpicxx %tsan-compile-flags -O2 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
+// RUN: %cusan-mpiexec -n 2 %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 // clang-format on
 
 // CHECK-DAG: ThreadSanitizer: data race
@@ -10,7 +10,7 @@
 
 #include "../support/gpu_mpi.h"
 
-__global__ void kernel(int *arr, const int N) {
+__global__ void kernel(int* arr, const int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   if (tid < N) {
 #if __CUDA_ARCH__ >= 700
@@ -24,15 +24,15 @@ __global__ void kernel(int *arr, const int N) {
   }
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   if (!has_gpu_aware_mpi()) {
     printf("[Error] This example is designed for CUDA-aware MPI. Exiting.\n");
     return 1;
   }
 
-  const int size = 512;
+  const int size            = 512;
   const int threadsPerBlock = size;
-  const int blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock;
+  const int blocksPerGrid   = (size + threadsPerBlock - 1) / threadsPerBlock;
 
   MPI_Init(&argc, &argv);
   int world_size, world_rank;
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  int *d_data;
+  int* d_data;
   cudaMalloc(&d_data, size * sizeof(int));
   cudaMemset(d_data, 0, size * sizeof(int));
   cudaDeviceSynchronize();
@@ -55,14 +55,13 @@ int main(int argc, char *argv[]) {
     // cudaStream_t stream2;
     cudaStreamCreate(&stream1);
     // cudaStreamCreate(&stream2);
-    int *h_data = (int *)malloc(size * sizeof(int));
+    int* h_data = (int*)malloc(size * sizeof(int));
 
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
     // https://docs.nvidia.com/cuda/cuda-runtime-api/api-sync-behavior.html#api-sync-behavior__memcpy-async
     // "For transfers between device memory and pageable host memory, the
     // function might be synchronous with respect to host."
-    cudaMemcpyAsync(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost,
-                    stream1);
+    cudaMemcpyAsync(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost, stream1);
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
 
     cudaStreamSynchronize(stream1);
@@ -73,7 +72,7 @@ int main(int argc, char *argv[]) {
   }
 
   if (world_rank == 1) {
-    int *h_data = (int *)malloc(size * sizeof(int));
+    int* h_data = (int*)malloc(size * sizeof(int));
     cudaMemcpy(h_data, d_data, size * sizeof(int), cudaMemcpyDeviceToHost);
     for (int i = 0; i < size; i++) {
       const int buf_v = h_data[i];

@@ -26,10 +26,10 @@ export OMP_NUM_THREADS=1
 
 export PATH="@MUST_BIN_DIR@":$PATH
 
-export TYPEART_TYPE_FILE="@CUCORR_YAML_DIR@/types-jacobi.yaml"
-export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-jacobi.yaml"
+export TYPEART_TYPE_FILE="@CUSAN_YAML_DIR@/types-jacobi.yaml"
+export CUSAN_KERNEL_DATA_FILE="@CUSAN_YAML_DIR@/kernel-jacobi.yaml"
 
-export TSAN_OPTIONS="exitcode=0 suppressions=@CUCORR_SUPPRESSION_DIR@/suppression-lb2.txt"
+export TSAN_OPTIONS="exitcode=0 suppressions=@CUSAN_SUPPRESSION_DIR@/suppression-lb2.txt"
 
 export MUST_MPIEXEC="srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket"
 
@@ -59,17 +59,17 @@ for d in 256 512 1024 2048 4096; do
   done
 done
 
-# Cucorr instrumentation
+# CuSan instrumentation
 for d in 256 512 1024 2048 4096; do
   for i in `seq 1 $b_reps`; do
-    LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "MTime=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p @CUTEST_JACOBI_CUCORR@  @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-cucorr-$d.txt
+    LD_PRELOAD="$<TARGET_FILE:cutest_memusage>" /usr/bin/time -f "MTime=%e" srun --cpu-freq=HighM1-HighM1 --cpu_bind=socket -n $num_p @CUTEST_JACOBI_CUSAN@  @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-cusan-$d.txt
   done
 done
 
-# Cucorr instrumentation
+# CuSan instrumentation
 for d in 256 512 1024 2048 4096; do
   for i in `seq 1 $b_reps`; do
-    /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:printmem @CUTEST_JACOBI_CUCORR@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cucorr-$d.txt
+    /usr/bin/time -f "MTime=%e" mustrun --must:layout "${must_layout}" --must:printmem @CUTEST_JACOBI_CUSAN@ @CUTEST_JACOBI_ARGS@ &>> "${bench_base_path}"/jacobi-must-cusan-$d.txt
   done
 done
 

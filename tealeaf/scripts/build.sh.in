@@ -1,18 +1,18 @@
 #!/bin/bash
 
-export TYPEART_TYPE_FILE="@CUCORR_YAML_DIR@/types-tealeaf.yaml"
-export CUCORR_KERNEL_DATA_FILE="@CUCORR_YAML_DIR@/kernel-tealeaf.yaml"
+export TYPEART_TYPE_FILE="@CUSAN_YAML_DIR@/types-tealeaf.yaml"
+export CUSAN_KERNEL_DATA_FILE="@CUSAN_YAML_DIR@/kernel-tealeaf.yaml"
 
-export CUCORR_MPICXX_EXEC="@cucorr_mpicxx@"
-export CUCORR_MPICC_EXEC="@cucorr_mpicc@"
+export CUSAN_MPICXX_EXEC="@cusan_mpicxx@"
+export CUSAN_MPICC_EXEC="@cusan_mpicc@"
 
 touch $TYPEART_TYPE_FILE
-touch $CUCORR_KERNEL_DATA_FILE
+touch $CUSAN_KERNEL_DATA_FILE
 
 tsan_flag=OFF
 compile_threads=1
 
-build_dir="build_cucorr"
+build_dir="build_cusan"
 preflag=$1
 if [ ! -z "$preflag" ]; then
   export $preflag
@@ -28,8 +28,8 @@ if [ ! -z "$2" ]; then
 fi
 
 
-CUCORR_WRAPPER=OFF cmake \
+CUSAN_WRAPPER=OFF cmake \
               -DENABLE_MPI=ON -B"${build_dir}" -DMODEL=cuda -DCUDA_ARCH=sm_70 -DCMAKE_CUDA_ARCHITECTURES=70 -DCMAKE_BUILD_TYPE=Release -DTHREAD_SANITIZER=$tsan_flag \
-              -DMODEL=cuda -DCMAKE_CUDA_COMPILER=$CUCORR_MPICXX_EXEC -DCMAKE_CXX_COMPILER=$CUCORR_MPICXX_EXEC  -DCMAKE_C_COMPILER=$CUCORR_MPICC_EXEC
+              -DMODEL=cuda -DCMAKE_CUDA_COMPILER=$CUSAN_MPICXX_EXEC -DCMAKE_CXX_COMPILER=$CUSAN_MPICXX_EXEC  -DCMAKE_C_COMPILER=$CUSAN_MPICC_EXEC
 
 cmake --build "${build_dir}" --clean-first -- -j$compile_threads
