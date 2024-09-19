@@ -23,7 +23,7 @@ echo "Build to $build_f ; Install to $install_f"
 
 function cusan_fetch() {
     cd "$base_cusan_f"
-    git clone https://github.com/ahueck/cusan.git cusan
+    git clone --depth 1 --branch v0.1 https://github.com/tudasc/cusan.git cusan
 }
 
 function cusan_config() {
