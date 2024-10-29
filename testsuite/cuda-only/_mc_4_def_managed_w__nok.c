@@ -4,7 +4,7 @@
 // clang-format on
 
 // CHECK-DAG: ThreadSanitizer: data race
-// CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream{{( [0-9]+)?}}'
 // CHECK-DAG: [Error] sync
 
 // REQUIRES: mca-rules

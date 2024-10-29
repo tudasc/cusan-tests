@@ -19,6 +19,9 @@ message(STATUS "Path to cusan installation is set to ${CUSAN_PATH}")
 
 find_package(MPI REQUIRED)
 
+option(CUSAN_TEST_USE_TSAN_WORKAROUNDS "Enable environment flags for making TSan work on HPC cluster" ON)
+mark_as_advanced(CUSAN_TEST_USE_TSAN_WORKAROUNDS)
+
 # Not so portable, but suffices
 find_program(cusan_mpicxx
     NAMES cusan-mpic++

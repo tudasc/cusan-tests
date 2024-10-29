@@ -4,7 +4,7 @@
 // clang-format on
 
 // CHECK-DAG: ThreadSanitizer: data race
-// CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-DAG: Thread T{{[0-9]+}} 'cuda_stream{{( [0-9]+)?}}'
 
 #include "../support/gpu_mpi.h"
 
@@ -49,9 +49,9 @@ int main(int argc, char* argv[]) {
   cudaDeviceSynchronize();
 
   if (world_rank == 0) {
-    //this kernel reads d_data
+    // this kernel reads d_data
     kernel<<<blocksPerGrid, threadsPerBlock>>>(d_data, size);
-    //mpi aswell so we get a race
+    // mpi aswell so we get a race
     MPI_Send(d_data, size, MPI_INT, 1, 0, MPI_COMM_WORLD);
   } else if (world_rank == 1) {
     MPI_Recv(d_data, size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);

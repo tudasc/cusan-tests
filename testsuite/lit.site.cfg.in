@@ -11,6 +11,7 @@ for envvar in os.environ:
     config.environment[envvar] = os.environ[envvar]
     continue
 
+config.llvm_version=@LLVM_VERSION_MAJOR@
 config.filecheck = "@CUTESTS_FILECHECK_EXEC@"
 config.mpiexec="@MPIEXEC@"
 
@@ -20,6 +21,7 @@ config.cusan_mpicxx="@cusan_mpicxx@"
 config.cusan_interceptor="@lib_cusan_interceptor@" 
 config.cusan_lib="@lib_cusan_runtime@"
 config.cusan_testdir="@CUTESTS_TEST_CUSAN_DIR@"
+config.cusan_workaround=@CUTESTS_WORKAROUND@
 
 config.cutests_build_dir="@CUTESTS_BUILD_DIR@"
 

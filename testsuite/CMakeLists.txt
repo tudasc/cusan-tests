@@ -6,6 +6,14 @@ endif()
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 
+macro(pythonize_bool truth_var var)
+  if(${truth_var})
+    set(${var} True)
+  else()
+    set(${var} False)
+  endif()
+endmacro()
+
 function(cutests_find_llvm_progs target names)
   cmake_parse_arguments(ARG "ABORT_IF_MISSING;SHOW_VAR" "DEFAULT_EXE" "HINTS" ${ARGN})
   set(TARGET_TMP ${target})
@@ -76,6 +84,7 @@ function(configure_cutests_lit_site_cfg input output)
   set(CUTESTS_BUILD_DIR ${CMAKE_BINARY_DIR})
   set(CUTESTS_TEST_CUSAN_DIR ${CMAKE_BINARY_DIR}/testsuite-exec)
   file(MAKE_DIRECTORY ${CUTESTS_TEST_CUSAN_DIR})
+  pythonize_bool(CUSAN_TEST_USE_TSAN_WORKAROUNDS CUTESTS_WORKAROUND)
 
   file(READ ${input} contents)
   string(CONFIGURE "${contents}" contents @ONLY)

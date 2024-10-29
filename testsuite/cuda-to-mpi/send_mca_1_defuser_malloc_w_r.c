@@ -4,7 +4,7 @@
 // clang-format on
 
 // CHECK-NOT: ThreadSanitizer: data race
-// CHECK-NOT: Thread T{{[0-9]+}} 'cuda_stream'
+// CHECK-NOT: Thread T{{[0-9]+}} 'cuda_stream{{( [0-9]+)?}}'
 
 #include "../support/gpu_mpi.h"
 
