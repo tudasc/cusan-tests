@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "1" == "@CUSAN_WORKAROUND@" ]; then
+  export NEOReadDebugKeys=1
+  export DisableDeepBind=1
+fi
+
 export TYPEART_TYPE_FILE="@CUSAN_YAML_DIR@/types-tealeaf.yaml"
 export CUSAN_KERNEL_DATA_FILE="@CUSAN_YAML_DIR@/kernel-tealeaf.yaml"
 

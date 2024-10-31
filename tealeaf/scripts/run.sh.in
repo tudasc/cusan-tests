@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ "1" == "@CUSAN_WORKAROUND@" ]; then
+  export OMPI_MCA_memory=^patcher 
+fi
+
 export TYPEART_TYPE_FILE="@CUSAN_YAML_DIR@/types-tealeaf.yaml"
 export CUSAN_KERNEL_DATA_FILE="@CUSAN_YAML_DIR@/kernel-tealeaf.yaml"
 

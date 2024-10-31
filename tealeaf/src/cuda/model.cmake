@@ -24,15 +24,7 @@ register_flag_optional(SYNC_ALL_KERNELS
 
 
 macro(setup)
-
-    # XXX CMake 3.18 supports CMAKE_CUDA_ARCHITECTURES/CUDA_ARCHITECTURES but we support older CMakes
-    if (POLICY CMP0104)
-        cmake_policy(SET CMP0104 OLD)
-    endif ()
-
     set(CMAKE_CXX_STANDARD 17)
-    enable_language(CUDA)
-
     if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
         set(CMAKE_CUDA_ARCHITECTURES 70)
     endif()
@@ -49,7 +41,14 @@ macro(setup)
 
     # CMake defaults to -O2 for CUDA at Release, let's wipe that and use the global RELEASE_FLAG
     # appended later
-    wipe_gcc_style_optimisation_flags(CMAKE_CUDA_FLAGS_${BUILD_TYPE})
+    if(NOT CMAKE_CUDA_FLAGS_${BUILD_TYPE})
+        wipe_gcc_style_optimisation_flags(CMAKE_CUDA_FLAGS)
+    else()
+        wipe_gcc_style_optimisation_flags(CMAKE_CUDA_FLAGS_${BUILD_TYPE})
+    endif()
+
+    # For Clang-18, we need the above flags to bet set, in order to avoid, e.g., __fp128 issues when try_compile is used
+    enable_language(CUDA)
 
     if (MANAGED_ALLOC)
         register_definitions(CLOVER_MANAGED_ALLOC)
