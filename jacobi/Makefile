@@ -49,7 +49,7 @@ BINARIES_CUSAN=$(JACOBI_CUDA_NORMAL_MPI)_cusan $(JACOBI_CUDA_AWARE_MPI)_cusan
 all: $(BINARIES)
 
 device.o: Jacobi.h Device.cu Makefile
-	$(NVCC) $(MPICFLAGS) $(CUDACFLAGS) --cuda-gpu-arch=sm_70 -c Device.cu -o device.o
+	$(NVCC) $(MPICFLAGS) $(CUDACFLAGS) ${CUTEST_ADDITIONAL_CFLAGS} --cuda-gpu-arch=sm_70 -c Device.cu -o device.o
 
 input.o: Jacobi.h Input.c Makefile
 	$(MPICC) $(MPICFLAGS) $(CUDACFLAGS) $(CFLAGS) -c Input.c -o input.o

@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if [ "1" == "@CUSAN_WORKAROUND@" ]; then
+  export NEOReadDebugKeys=1
+  export DisableDeepBind=1
+  cusan_additional_args="-fPIC -D__STRICT_ANSI__"
+  
+fi
+
 export TYPEART_TYPE_FILE="@CUSAN_YAML_DIR@/types-jacobi.yaml"
 export CUSAN_KERNEL_DATA_FILE="@CUSAN_YAML_DIR@/kernel-jacobi.yaml"
 
@@ -19,9 +26,9 @@ fi
 
 if [ ! -z "$2" ]; then
   echo "Vanilla with ThreadSanitizer $2"
-  make all -j 8 CUTEST_ADDITIONAL_CFLAGS="$2"
+  make all -j 8 CUTEST_ADDITIONAL_CFLAGS="$2 ${cusan_additional_args}"
 else
-  make all -j 1
+  make all -j 1 CUTEST_ADDITIONAL_CFLAGS="${cusan_additional_args}"
 fi
 
 if [ ! -z "$preflag" ]; then

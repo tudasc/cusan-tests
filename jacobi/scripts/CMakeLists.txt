@@ -70,6 +70,12 @@ function(add_build_clean_target name dir)
     )
 endfunction()
 
+if(CUSAN_TEST_USE_TSAN_WORKAROUNDS)
+  set(CUSAN_WORKAROUND 1)
+else()
+  set(CUSAN_WORKAROUND 0)
+endif()
+
 
 set(CUTEST_NP 2)
 set(CUSAN_YAML_DIR ${PROJECT_SOURCE_DIR}/jacobi)
