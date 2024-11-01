@@ -37,7 +37,7 @@ macro(setup)
     else()
         set(CUSAN_ARCH_FLAG -arch=${CUDA_ARCH})
     endif()
-    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++17 ${CUSAN_ARCH_FLAG} ${CUDA_EXTRA_FLAGS}")
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++17 -fPIC ${CUSAN_ARCH_FLAG} ${CUDA_EXTRA_FLAGS}")
 
     # CMake defaults to -O2 for CUDA at Release, let's wipe that and use the global RELEASE_FLAG
     # appended later
