@@ -1,5 +1,5 @@
 // clang-format off
-// RUN: %cusan-mpicxx %tsan-compile-flags -O1 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
+// RUN: %cusan-mpicxx %tsan-compile-flags -O2 -g -x cuda -gencode arch=compute_70,code=sm_70 %s  -o %cutests_test_dir/%basename_t.exe
 // RUN: %tsan-options %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 
 // clang-format on
@@ -48,7 +48,7 @@ int main() {
   write_kernel_delay<<<blocksPerGrid, threadsPerBlock, 0, stream1>>>(data, size, 1316134912);
   // do a free which implicitly syncs/blocks
   cudaFree(data2);
-  //so this memcpy is safe
+  // so this memcpy is safe
   cudaMemcpyAsync(h_data, data, size * sizeof(int), cudaMemcpyDefault, stream2);
   cudaStreamSynchronize(stream2);
   for (int i = 0; i < size; i++) {

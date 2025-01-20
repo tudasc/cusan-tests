@@ -1,5 +1,5 @@
 // clang-format off
-// RUN: %cusan-mpicxx %tsan-compile-flags -O1 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
+// RUN: %cusan-mpicxx %tsan-compile-flags -O2 -g -x cuda -gencode arch=compute_70,code=sm_70 %s  -o %cutests_test_dir/%basename_t.exe
 // RUN: %tsan-options %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 
 // clang-format on

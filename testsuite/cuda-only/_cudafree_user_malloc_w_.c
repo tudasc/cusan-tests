@@ -1,9 +1,9 @@
 // clang-format off
-// RUN: %cusan-mpicxx %tsan-compile-flags -O1 -g %s -x cuda -gencode arch=compute_70,code=sm_70 -o %cutests_test_dir/%basename_t.exe
+// RUN: %cusan-mpicxx %tsan-compile-flags -O2 -g -x cuda -gencode arch=compute_70,code=sm_70 %s  -o %cutests_test_dir/%basename_t.exe
 // RUN: %tsan-options %cutests_test_dir/%basename_t.exe 2>&1 | %filecheck %s
 
 // clang-format on
- 
+
 // CHECK-NOT: ThreadSanitizer: data race
 // CHECK-NOT: [Error] sync
 
@@ -53,7 +53,6 @@ int main() {
 
   // sleep 1 second to allow the first kernel to overwrite some data
   sleep(1);
-
 
   cudaMemcpyAsync(h_data, data, size * sizeof(int), cudaMemcpyDefault, stream2);
   cudaStreamSynchronize(stream2);
